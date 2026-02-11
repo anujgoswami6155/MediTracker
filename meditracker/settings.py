@@ -45,8 +45,8 @@ INSTALLED_APPS = [
     "adherence",
     "documents",
     "appointments",
-
-
+    "instructions",
+    "monitoring",
 ]
 
 MIDDLEWARE = [
