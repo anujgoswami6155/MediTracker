@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     "appointments",
     "instructions",
     "monitoring",
+    "core",
 ]
 
 MIDDLEWARE = [
