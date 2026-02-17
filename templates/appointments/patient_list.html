@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>My Appointments</h2>
+<a href="{% url 'appointments:request' %}">+ Request Appointment</a>
+
+<ul>
+  {% for a in appointments %}
+    <li>
+      {{ a.patient }} → {{ a.doctor }} | {{ a.appointment_date }} {{ a.appointment_time }} | {{ a.status }}
+      {% if a.status != "completed" %}
+        | <a href="{% url 'appointments:cancel' a.id %}">Cancel</a>
+      {% endif %}
+    </li>
+  {% empty %}
+    <li>No appointments yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

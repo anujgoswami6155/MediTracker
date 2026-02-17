@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Reminders</h2>
+<a href="{% url 'adherence:reminder_create' %}">+ Add Reminder</a>
+<ul>
+  {% for r in reminders %}
+    <li>
+      {{ r }}
+      | <a href="{% url 'adherence:reminder_edit' r.id %}">Edit</a>
+      | <a href="{% url 'adherence:reminder_delete' r.id %}">Delete</a>
+    </li>
+  {% empty %}
+    <li>No reminders yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

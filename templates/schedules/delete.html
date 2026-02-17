@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Delete Schedule</h2>
+
+<p>Delete: <b>{{ schedule }}</b> ?</p>
+
+<form method="post">
+  {% csrf_token %}
+  <button type="submit">Yes, delete</button>
+</form>
+
+<a href="{% url 'schedules:list' %}">Cancel</a>
+{% endblock %}

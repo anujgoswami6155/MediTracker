@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Intake Logs</h2>
+<a href="{% url 'adherence:intake_create' %}">+ Add Intake</a>
+<ul>
+  {% for l in logs %}
+    <li>
+      {{ l }}
+      | <a href="{% url 'adherence:intake_edit' l.id %}">Edit</a>
+      | <a href="{% url 'adherence:intake_delete' l.id %}">Delete</a>
+    </li>
+  {% empty %}
+    <li>No logs yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}

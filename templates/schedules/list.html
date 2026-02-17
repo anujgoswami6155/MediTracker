@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+{% block content %}
+<h2>Schedules</h2>
+
+<a href="{% url 'schedules:create' %}">+ Create</a>
+
+<ul>
+  {% for s in schedules %}
+    <li>
+      {{ s }}
+      | <a href="{% url 'schedules:edit' s.id %}">Edit</a>
+      | <a href="{% url 'schedules:delete' s.id %}">Delete</a>
+    </li>
+  {% empty %}
+    <li>No schedules yet.</li>
+  {% endfor %}
+</ul>
+{% endblock %}
