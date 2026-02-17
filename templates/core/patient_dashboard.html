@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>👤 Patient Dashboard</h2>
+<p>Welcome, {{ request.user.username }}!</p>
+<p>Role: {{ request.user.role }}</p>
+
+<hr>
+<h3>Quick Links</h3>
+<ul>
+    <li><a href="#">My Medicines</a></li>
+    <li><a href="#">My Schedule</a></li>
+    <li><a href="#">My Documents</a></li>
+    <li><a href="#">My Appointments</a></li>
+</ul>
+
+<a href="{% url 'accounts:logout' %}">Logout</a>
+{% endblock %}

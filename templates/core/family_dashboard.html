@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>👨‍👩‍👧 Family Dashboard</h2>
+<p>Welcome, {{ request.user.username }}!</p>
+<p>Role: {{ request.user.role }}</p>
+
+<hr>
+<h3>Quick Links</h3>
+<ul>
+    <li><a href="#">Monitor Patient</a></li>
+    <li><a href="#">View Alerts</a></li>
+    <li><a href="#">Adherence Report</a></li>
+</ul>
+
+<a href="{% url 'accounts:logout' %}">Logout</a>
+{% endblock %}
