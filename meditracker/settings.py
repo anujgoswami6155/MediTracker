@@ -64,7 +64,7 @@ ROOT_URLCONF = 'meditracker.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [],
+        'DIRS': [BASE_DIR / "templates"],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -112,6 +112,10 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+# ✅ LOGIN / LOGOUT SETTINGS
+LOGIN_URL = "/accounts/login/"
+LOGIN_REDIRECT_URL = "/accounts/login/"  # Redirect handled in LoginView
+LOGOUT_REDIRECT_URL = "/accounts/login/"
 
 # Internationalization
 # https://docs.djangoproject.com/en/6.0/topics/i18n/
