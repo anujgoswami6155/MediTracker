@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Review Appointment | MediTracker</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
+
+<aside class="w-64 bg-[#0E1626] text-white flex flex-col justify-between">
+  <div>
+    <div class="flex items-center gap-2 px-6 py-6 text-xl font-bold text-emerald-400">
+      💚 MediTracker
+    </div>
+
+    <nav class="mt-6 space-y-1">
+      <a class="flex items-center gap-3 px-6 py-3 rounded-r-full bg-[#3F8F6B]">
+        🏠 Dashboard
+      </a>
+      <a href="appointment-list.html"
+         class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+        📅 Appointments
+      </a>
+    </nav>
+  </div>
+
+  <div class="px-6 py-6 border-t border-[#111827]">
+    <p class="text-sm font-semibold">Dr. John Smith</p>
+    <p class="text-xs text-gray-400">Cardiologist</p>
+  </div>
+</aside>
+
+<main class="flex-1 p-10">
+
+<h1 class="text-3xl font-bold mb-8">Review Appointment</h1>
+
+<!-- Appointment Summary -->
+<div class="bg-white rounded-[20px] shadow p-6 mb-8">
+  <h2 class="font-semibold mb-4">Appointment Details</h2>
+  <div class="grid grid-cols-3 gap-4 text-sm">
+    <p><b>Patient:</b> Sarah Chen</p>
+    <p><b>Date:</b> 15 Jan 2026</p>
+    <p><b>Time:</b> 10:30 AM</p>
+    <p><b>Reason:</b> Regular follow-up</p>
+  </div>
+</div>
+
+<!-- PATIENT DATA GRID -->
+<div class="grid grid-cols-3 gap-6">
+
+  <!-- HISTORY -->
+  <div class="bg-white rounded-[20px] shadow p-6">
+    <h3 class="font-semibold mb-4">Medical History</h3>
+    <ul class="text-sm space-y-2">
+      <li>📅 Appointment – 10 Jan 2026</li>
+      <li>💊 Metformin – ongoing</li>
+      <li>📊 Adherence – 92%</li>
+    </ul>
+  </div>
+
+  <!-- REPORTS -->
+  <div class="bg-white rounded-[20px] shadow p-6">
+    <h3 class="font-semibold mb-4">Medical Reports</h3>
+    <ul class="text-sm space-y-2">
+      <li>📄 Blood_Work_Oct.pdf</li>
+      <li>🩻 X-Ray_Chest.jpg</li>
+    </ul>
+  </div>
+
+  <!-- INSTRUCTIONS -->
+  <div class="bg-white rounded-[20px] shadow p-6">
+    <h3 class="font-semibold mb-4">Previous Instructions</h3>
+    <ul class="text-sm space-y-2">
+      <li>💬 Take medicines regularly</li>
+      <li>💬 Avoid oily food</li>
+    </ul>
+  </div>
+
+</div>
+
+<!-- ACTIONS -->
+<div class="mt-10 flex gap-4">
+  <a href="doctor-dashboard.html"
+     class="bg-[#3F8F6B] text-white px-10 py-4 rounded-xl font-semibold">
+    Approve Appointment
+  </a>
+  <a href="reschedule-appointment.html"
+     class="bg-[#F59E0B] text-white px-10 py-4 rounded-xl font-semibold">
+    Reschedule
+  </a>
+</div>
+
+</main>
+</div>
+</body>
+</html>

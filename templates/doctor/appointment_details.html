@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Appointment Details</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
+
+<aside class="w-64 bg-[#0E1626] text-white flex flex-col justify-between">
+  <div>
+    <div class="flex items-center gap-2 px-6 py-6 text-xl font-bold text-emerald-400">
+      💚 MediTracker
+    </div>
+
+    <nav class="mt-6 space-y-1">
+      <a class="flex items-center gap-3 px-6 py-3 rounded-r-full bg-[#3F8F6B]">
+        🏠 Dashboard
+      </a>
+      <a href="appointment-list.html"
+         class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+        📅 Appointments
+      </a>
+    </nav>
+  </div>
+
+  <div class="px-6 py-6 border-t border-[#111827]">
+    <p class="text-sm font-semibold">Dr. John Smith</p>
+    <p class="text-xs text-gray-400">Cardiologist</p>
+  </div>
+</aside>
+
+<main class="flex-1 p-10">
+<h1 class="text-3xl font-bold mb-8">Appointment Details</h1>
+
+<div class="bg-white rounded-[20px] shadow p-8 max-w-3xl space-y-4">
+  <p><b>Patient:</b> Sarah Chen</p>
+  <p><b>Date:</b> 15 Jan 2026</p>
+  <p><b>Time:</b> 10:30 AM</p>
+  <p><b>Reason:</b> Regular follow-up</p>
+
+  <div class="flex gap-4 mt-8">
+    <a href="approve-appointment.html"
+       class="bg-[#3F8F6B] text-white px-8 py-3 rounded-xl font-semibold">
+      Approve
+    </a>
+    <a href="reschedule-appointment.html"
+       class="bg-[#F59E0B] text-white px-8 py-3 rounded-xl font-semibold">
+      Reschedule
+    </a>
+  </div>
+</div>
+
+</main>
+</div>
+</body>
+</html>

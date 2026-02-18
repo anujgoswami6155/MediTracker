@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 from core.decorators import role_required
+from appointments.models import Appointment
 
 
 # 🔹 Patient Dashboard
@@ -14,7 +15,30 @@ def patient_dashboard(request):
 @login_required
 @role_required("doctor")
 def doctor_dashboard(request):
-    return render(request, "core/doctor_dashboard.html")
+    doctor = request.user
+
+    pending = Appointment.objects.filter(
+        doctor=doctor,
+        status="requested"
+    ).count()
+
+    today = Appointment.objects.filter(
+        doctor=doctor
+    ).count()
+
+    approved = Appointment.objects.filter(
+        doctor=doctor,
+        status="approved"
+    ).count()
+
+    context = {
+        "pending": pending,
+        "today": today,
+        "approved": approved,
+    }
+
+    return render(request, "doctor/doctor_dashboard.html", context)
+
 
 
 # 🔹 Family Dashboard

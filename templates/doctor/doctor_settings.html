@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Doctor Settings | MediTracker</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F6F9FB] font-sans">
+<div class="flex min-h-screen">
+
+<aside class="w-64 bg-[#0F172A] text-white flex flex-col justify-between">
+  <div>
+    <div class="px-6 py-6 text-xl font-bold text-emerald-400">💚 MediTracker</div>
+
+    <nav class="mt-6 space-y-1">
+      <a href="doctor-dashboard.html" class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800">🏠 Dashboard</a>
+      <a href="appointment-list.html" class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800">📅 Appointments</a>
+      <a href="patient-history.html" class="flex items-center gap-3 px-6 py-3 hover:bg-slate-800">📖 Patient History</a>
+
+      <!-- ACTIVE -->
+      <a class="flex items-center gap-3 px-6 py-3 rounded-r-full bg-emerald-600">
+        ⚙️ Settings
+      </a>
+    </nav>
+  </div>
+
+  <div class="px-6 py-6 border-t border-slate-700">
+    <p class="text-sm font-semibold">Dr. John Smith</p>
+    <p class="text-xs text-gray-400">Doctor</p>
+  </div>
+</aside>
+
+<main class="flex-1 p-10">
+  <h1 class="text-3xl font-bold mb-8">Doctor Settings</h1>
+
+  <div class="bg-white rounded-2xl p-8 max-w-xl shadow space-y-6">
+    <input type="text" placeholder="Doctor Name" class="w-full border rounded-xl px-5 py-3">
+    <input type="text" placeholder="Specialization" class="w-full border rounded-xl px-5 py-3">
+    <input type="email" placeholder="Email" class="w-full border rounded-xl px-5 py-3">
+
+    <button class="bg-emerald-600 text-white px-8 py-3 rounded-xl font-semibold">
+      Update Profile
+    </button>
+  </div>
+</main>
+
+</div>
+</body>
+</html>

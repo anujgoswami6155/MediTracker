@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Doctor Dashboard | MediTracker</title>
+<script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
+
+<!-- SIDEBAR -->
+<aside class="w-64 bg-[#0E1626] text-white flex flex-col justify-between">
+  <div>
+    <div class="flex items-center gap-2 px-6 py-6 text-xl font-bold text-emerald-400">
+      💚 MediTracker
+    </div>
+
+    <nav class="mt-6 space-y-1">
+      <a class="flex items-center gap-3 px-6 py-3 rounded-r-full bg-[#3F8F6B]">
+        🏠 Dashboard
+      </a>
+      <a href="{% url 'appointments:doctor_list' %}"
+   class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+   📅 Appointments
+</a>
+    </nav>
+  </div>
+
+  <div class="px-6 py-6 border-t border-[#111827]">
+    <p class="text-sm font-semibold">Dr. John Smith</p>
+    <p class="text-xs text-gray-400">Cardiologist</p>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<main class="flex-1 p-10">
+
+  <h1 class="text-4xl font-bold text-[#0F172A] mb-2">
+    Welcome back, Doctor 👋
+  </h1>
+  <p class="text-[#6B7280] mb-10">
+    Overview of your schedule and requests
+  </p>
+
+  <!-- KPI CARDS -->
+  <div class="grid grid-cols-4 gap-6 mb-10">
+
+    <div class="bg-white rounded-[20px] shadow p-6">
+      <p class="text-sm text-[#6B7280]">Pending Requests</p>
+      <p class="text-4xl font-bold text-[#3F8F6B] mt-2">3</p>
+    </div>
+
+    <div class="bg-white rounded-[20px] shadow p-6">
+      <p class="text-sm text-[#6B7280]">Today’s Appointments</p>
+      <p class="text-4xl font-bold text-[#3F8F6B] mt-2">5</p>
+    </div>
+
+    <div class="bg-white rounded-[20px] shadow p-6">
+      <p class="text-sm text-[#6B7280]">Approved This Week</p>
+      <p class="text-4xl font-bold text-[#3F8F6B] mt-2">18</p>
+    </div>
+
+    <div class="bg-white rounded-[20px] shadow p-6">
+      <p class="text-sm text-[#6B7280]">Unread Alerts</p>
+      <p class="text-4xl font-bold text-[#EF4444] mt-2">1</p>
+    </div>
+
+  </div>
+
+  <!-- QUICK ACTION -->
+  <div class="bg-white rounded-[20px] shadow p-8 max-w-3xl">
+    <h2 class="text-lg font-semibold mb-4">Quick Actions</h2>
+    <a href="{% url 'appointments:doctor_list' %}"
+       class="inline-block bg-[#EAF7F1] text-[#3F8F6B]
+              px-6 py-4 rounded-xl font-semibold">
+      Review Appointment Requests →
+    </a>
+  </div>
+
+</main>
+</div>
+</body>
+</html>

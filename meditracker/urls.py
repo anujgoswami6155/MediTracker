@@ -8,7 +8,9 @@ urlpatterns = [
     path('', RedirectView.as_view(url='accounts/login/')),
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
-    path('core/', include('core.urls')),  # ← Added
+    path('core/', include('core.urls')), 
+    path("appointments/", include("appointments.urls")),
+
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -70,3 +70,40 @@ def update_appointment(request, pk):
         form = AppointmentDoctorUpdateForm(instance=appt)
 
     return render(request, "appointments/form.html", {"form": form, "title": "Update Appointment"})
+@role_required("doctor")
+def review_appointment(request, pk):
+    appt = get_object_or_404(Appointment, pk=pk, doctor=request.user)
+
+    return render(request, "doctor/appointment_review.html", {
+        "appointment": appt
+    })
+
+
+@role_required("doctor")
+def appointment_details(request, pk):
+    appt = get_object_or_404(Appointment, pk=pk, doctor=request.user)
+
+    return render(request, "doctor/appointment_details.html", {
+        "appointment": appt
+    })
+
+
+@role_required("doctor")
+def reschedule_appointment(request, pk):
+    appt = get_object_or_404(Appointment, pk=pk, doctor=request.user)
+
+    if request.method == "POST":
+        new_date = request.POST.get("appointment_date")
+        new_time = request.POST.get("appointment_time")
+
+        if new_date and new_time:
+            appt.appointment_date = new_date
+            appt.appointment_time = new_time
+            appt.status = "approved"
+            appt.save(update_fields=["appointment_date", "appointment_time", "status"])
+
+            return redirect("appointments:doctor_list")
+
+    return render(request, "doctor/reschedule_appointment.html", {
+        "appointment": appt
+    })
