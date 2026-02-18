@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>My Documents</h2>
+
+<a href="{% url 'documents:upload' %}">Upload New Document</a>
+
+<hr>
+
+<ul>
+  {% for doc in documents %}
+    <li>
+      <strong>{{ doc.title }}</strong>
+      ({{ doc.document_type }})
+      <br>
+      <a href="{% url 'documents:detail' doc.id %}">View</a> |
+      {% if user.role == "patient" %}
+        <a href="{% url 'documents:delete' doc.id %}">Delete</a>
+      {% endif %}
+    </li>
+  {% empty %}
+    <li>No documents found.</li>
+  {% endfor %}
+</ul>
+
+{% endblock %}

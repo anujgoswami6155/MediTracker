@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Document Details</h2>
+
+<p><strong>Title:</strong> {{ document.title }}</p>
+<p><strong>Type:</strong> {{ document.document_type }}</p>
+<p><strong>Notes:</strong> {{ document.notes }}</p>
+
+<a href="{{ document.file.url }}" target="_blank">Download File</a>
+<br><br>
+
+<a href="{% url 'documents:list' %}">Back to list</a>
+
+{% endblock %}
