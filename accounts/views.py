@@ -7,7 +7,6 @@ from .forms import UserRegisterForm
 from .models import User
 
 
-# 🔹 Signup View
 class UserRegisterView(CreateView):
     model = User
     form_class = UserRegisterForm
@@ -15,9 +14,9 @@ class UserRegisterView(CreateView):
     success_url = reverse_lazy("accounts:login")
 
 
-# 🔹 Login View
 class UserLoginView(LoginView):
     template_name = "accounts/login.html"
+    redirect_authenticated_user = True   
 
     def get_success_url(self):
         user = self.request.user
@@ -33,7 +32,6 @@ class UserLoginView(LoginView):
 
         return reverse_lazy("accounts:login")
 
-
-# 🔹 Logout View
+    
 class UserLogoutView(LogoutView):
     next_page = reverse_lazy("accounts:login")

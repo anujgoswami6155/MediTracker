@@ -1,10 +1,68 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Register | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-{% block content %}
-<h2>Register</h2>
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Register</button>
-</form>
-{% endblock %}
+<body class="bg-slate-900 flex items-center justify-center min-h-screen p-6">
+
+  <div class="bg-white p-8 rounded-xl w-full max-w-md">
+    <h2 class="text-2xl font-bold text-center mb-2">Create Account</h2>
+    <p class="text-sm text-center text-gray-500 mb-6">Join MediTracker</p>
+
+    {% if form.errors %}
+      <div class="bg-red-50 border border-red-200 text-red-700 text-sm p-3 rounded mb-4">
+        Please fix the errors below.
+      </div>
+    {% endif %}
+
+    <form method="post" class="space-y-4">
+      {% csrf_token %}
+
+      {% for field in form %}
+        <div>
+          <label class="block text-sm font-medium text-gray-600 mb-1">
+            {{ field.label }}
+          </label>
+
+          {{ field }}
+
+          {% if field.errors %}
+            <p class="text-red-500 text-xs mt-1">{{ field.errors|striptags }}</p>
+          {% endif %}
+        </div>
+      {% endfor %}
+
+      <button type="submit"
+              class="bg-teal-600 text-white w-full py-2 rounded hover:bg-teal-700 transition">
+        Register
+      </button>
+    </form>
+
+    <p class="text-sm text-center mt-4">
+      Already have an account?
+      <a href="{% url 'accounts:login' %}" class="text-teal-600 font-semibold hover:underline">
+        Login
+      </a>
+    </p>
+  </div>
+
+  <!-- Make Django default form fields look nice -->
+  <style>
+    input, select {
+      width: 100%;
+      border: 1px solid #d1d5db;
+      padding: 0.5rem;
+      border-radius: 0.375rem;
+      outline: none;
+    }
+    input:focus, select:focus {
+      border-color: #14b8a6;
+      box-shadow: 0 0 0 2px rgba(20, 184, 166, 0.25);
+    }
+  </style>
+
+</body>
+</html>
