@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>Reschedule Appointment | MediTracker</title>
-<script src="https://cdn.tailwindcss.com"></script>
+  <meta charset="UTF-8">
+  <title>Reschedule Appointment | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
 <body class="bg-[#F7FAFC] font-sans">
 <div class="flex min-h-screen">
 
-  <!-- SIDEBAR (same as doctor-dashboard.html) -->
+  <!-- SIDEBAR -->
   <aside class="w-64 bg-[#0E1626] text-white flex flex-col justify-between">
     <div>
       <div class="flex items-center gap-2 px-6 py-6 text-xl font-bold text-emerald-400">
@@ -17,11 +17,11 @@
       </div>
 
       <nav class="mt-6 space-y-1">
-        <a href="doctor-dashboard.html"
+        <a href="{% url 'core:doctor_dashboard' %}"
            class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
           🏠 Dashboard
         </a>
-        <a href="appointment-list.html"
+        <a href="{% url 'appointments:doctor_list' %}"
            class="flex items-center gap-3 px-6 py-3 rounded-r-full bg-[#3F8F6B]">
           📅 Appointments
         </a>
@@ -29,89 +29,72 @@
     </div>
 
     <div class="px-6 py-6 border-t border-[#111827]">
-      <p class="text-sm font-semibold">Dr. John Smith</p>
-      <p class="text-xs text-gray-400">Cardiologist</p>
+      <p class="text-sm font-semibold">{{ request.user }}</p>
+      <p class="text-xs text-gray-400">Doctor</p>
     </div>
   </aside>
 
   <!-- MAIN -->
   <main class="flex-1 p-10">
 
-    <!-- HEADER -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-[#0F172A]">
-        Reschedule Appointment
-      </h1>
-      <p class="text-[#6B7280] mt-1">
-        Update the appointment date or time if required
-      </p>
+      <h1 class="text-3xl font-bold text-[#0F172A]">Reschedule Appointment</h1>
+      <p class="text-[#6B7280] mt-1">Update the appointment date or time if required</p>
     </div>
 
     <!-- CURRENT APPOINTMENT INFO -->
     <div class="bg-white rounded-[20px] shadow-[0_10px_25px_rgba(15,23,42,0.08)]
                 p-6 mb-8 max-w-4xl">
-
-      <h2 class="text-lg font-semibold mb-4">
-        Current Appointment Details
-      </h2>
+      <h2 class="text-lg font-semibold mb-4">Current Appointment Details</h2>
 
       <div class="grid grid-cols-3 gap-4 text-sm">
-        <p><b>Patient:</b> Sarah Chen</p>
-        <p><b>Date:</b> 15 Jan 2026</p>
-        <p><b>Time:</b> 10:30 AM</p>
-        <p><b>Reason:</b> Regular follow-up</p>
+        <p><b>Patient:</b> {{ appointment.patient }}</p>
+        <p><b>Date:</b> {{ appointment.appointment_date }}</p>
+        <p><b>Time:</b> {{ appointment.appointment_time }}</p>
+        <p><b>Status:</b> {{ appointment.status|title }}</p>
       </div>
     </div>
 
-    <!-- RESCHEDULE FORM -->
-    <div class="bg-white rounded-[20px] shadow-[0_10px_25px_rgba(15,23,42,0.08)]
-                p-8 max-w-xl">
+    <!-- ✅ RESCHEDULE FORM (THIS IS THE FIX) -->
+    <form method="post"
+          class="bg-white rounded-[20px] shadow-[0_10px_25px_rgba(15,23,42,0.08)]
+                 p-8 max-w-xl">
+      {% csrf_token %}
 
-      <h2 class="text-lg font-semibold mb-6">
-        New Schedule
-      </h2>
+      <h2 class="text-lg font-semibold mb-6">New Schedule</h2>
 
-      <!-- New Date -->
       <div class="mb-5">
-        <label class="block text-sm font-medium text-[#6B7280] mb-2">
-          New Date
-        </label>
-        <input type="date"
-          class="w-full border border-[#E5E7EB] rounded-xl px-5 py-4
-                 focus:ring-2 focus:ring-[#4FAE8C] outline-none"/>
+        <label class="block text-sm font-medium text-[#6B7280] mb-2">New Date</label>
+        <input type="date" name="appointment_date" required
+               class="w-full border border-[#E5E7EB] rounded-xl px-5 py-4
+                      focus:ring-2 focus:ring-[#4FAE8C] outline-none" />
       </div>
 
-      <!-- New Time -->
       <div class="mb-6">
-        <label class="block text-sm font-medium text-[#6B7280] mb-2">
-          New Time
-        </label>
-        <input type="time"
-          class="w-full border border-[#E5E7EB] rounded-xl px-5 py-4
-                 focus:ring-2 focus:ring-[#4FAE8C] outline-none"/>
+        <label class="block text-sm font-medium text-[#6B7280] mb-2">New Time</label>
+        <input type="time" name="appointment_time" required
+               class="w-full border border-[#E5E7EB] rounded-xl px-5 py-4
+                      focus:ring-2 focus:ring-[#4FAE8C] outline-none" />
       </div>
 
-      <!-- INFO NOTE -->
       <p class="text-sm text-[#6B7280] mb-8">
         The patient will be notified automatically about the updated schedule.
       </p>
 
-      <!-- ACTION BUTTONS -->
       <div class="flex gap-4">
-        <a href="appointment-review.html"
-           class="bg-[#3F8F6B] text-white px-8 py-4 rounded-xl
-                  font-semibold hover:opacity-90 transition">
+        <button type="submit"
+                class="bg-[#3F8F6B] text-white px-8 py-4 rounded-xl
+                       font-semibold hover:opacity-90 transition">
           Update Schedule
-        </a>
+        </button>
 
-        <a href="appointment-review.html"
+        <a href="{% url 'appointments:doctor_review' appointment.id %}"
            class="bg-white border border-[#E5E7EB] px-8 py-4 rounded-xl
                   font-semibold hover:bg-gray-50">
           Cancel
         </a>
       </div>
-
-    </div>
+    </form>
 
   </main>
 </div>

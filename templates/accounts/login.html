@@ -1,26 +1,24 @@
-{% extends "base.html" %}
+<h1>MediTracker</h1>
+<hr>
 
-{% block content %}
 <h2>Login</h2>
 
 <form method="post">
-    {% csrf_token %}
-    
-    <div>
-        <label>Username:</label>
-        {{ form.username }}
-    </div>
+  {% csrf_token %}
 
-    <div>
-        <label>Password:</label>
-        {{ form.password }}
-    </div>
+  <label>Username:</label>
+  <input type="text" name="username" required>
 
-    <button type="submit">Login</button>
+  <br><br>
+
+  <label>Password:</label>
+  <input type="password" name="password" required>
+
+  <br><br>
+
+  <button type="submit">Login</button>
 </form>
 
 {% if form.errors %}
-    <p style="color:red;">Invalid username or password</p>
+  <p style="color:red;">Invalid username or password</p>
 {% endif %}
-
-{% endblock %}

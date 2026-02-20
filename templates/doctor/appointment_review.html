@@ -81,16 +81,20 @@
 </div>
 
 <!-- ACTIONS -->
-<div class="mt-10 flex gap-4">
-  <a href="doctor-dashboard.html"
-     class="bg-[#3F8F6B] text-white px-10 py-4 rounded-xl font-semibold">
+
+<form method="post" class="mt-10 flex gap-4">
+  {% csrf_token %}
+
+  <button type="submit" name="action" value="approve"
+          class="bg-[#3F8F6B] text-white px-10 py-4 rounded-xl font-semibold">
     Approve Appointment
-  </a>
-  <a href="reschedule-appointment.html"
-     class="bg-[#F59E0B] text-white px-10 py-4 rounded-xl font-semibold">
+  </button>
+
+  <button type="submit" name="action" value="reschedule"
+          class="bg-[#F59E0B] text-white px-10 py-4 rounded-xl font-semibold">
     Reschedule
-  </a>
-</div>
+  </button>
+</form>
 
 </main>
 </div>

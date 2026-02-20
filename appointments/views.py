@@ -33,7 +33,6 @@ def request_appointment(request):
 def cancel_appointment(request, pk):
     appt = get_object_or_404(Appointment, pk=pk, patient=request.user)
 
-    # only allow cancel if not completed
     if appt.status == "completed":
         return redirect("appointments:patient_list")
 
@@ -54,7 +53,7 @@ def cancel_appointment(request, pk):
 @role_required("doctor")
 def doctor_appointments(request):
     appointments = Appointment.objects.filter(doctor=request.user).order_by("-created_at")
-    return render(request, "appointments/doctor_list.html", {"appointments": appointments})
+    return render(request, "doctor/appointment_list.html", {"appointments": appointments})
 
 
 @role_required("doctor")
@@ -70,22 +69,31 @@ def update_appointment(request, pk):
         form = AppointmentDoctorUpdateForm(instance=appt)
 
     return render(request, "appointments/form.html", {"form": form, "title": "Update Appointment"})
+
+
+# ✅ UPDATED: Approve + Reschedule from review page
 @role_required("doctor")
 def review_appointment(request, pk):
     appt = get_object_or_404(Appointment, pk=pk, doctor=request.user)
 
-    return render(request, "doctor/appointment_review.html", {
-        "appointment": appt
-    })
+    if request.method == "POST":
+        action = request.POST.get("action")
+
+        if action == "approve":
+            appt.status = "approved"
+            appt.save(update_fields=["status"])
+            return redirect("appointments:doctor_list")
+
+        if action == "reschedule":
+            return redirect("appointments:doctor_reschedule", pk=appt.pk)
+
+    return render(request, "doctor/appointment_review.html", {"appointment": appt})
 
 
 @role_required("doctor")
 def appointment_details(request, pk):
     appt = get_object_or_404(Appointment, pk=pk, doctor=request.user)
-
-    return render(request, "doctor/appointment_details.html", {
-        "appointment": appt
-    })
+    return render(request, "doctor/appointment_details.html", {"appointment": appt})
 
 
 @role_required("doctor")
@@ -101,9 +109,6 @@ def reschedule_appointment(request, pk):
             appt.appointment_time = new_time
             appt.status = "approved"
             appt.save(update_fields=["appointment_date", "appointment_time", "status"])
-
             return redirect("appointments:doctor_list")
 
-    return render(request, "doctor/reschedule_appointment.html", {
-        "appointment": appt
-    })
+    return render(request, "doctor/reschedule_appointment.html", {"appointment": appt})
