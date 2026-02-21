@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>👤 My Profile</h2>
+
+<p><strong>Username:</strong> {{ profile.user.username }}</p>
+<p><strong>Email:</strong> {{ profile.user.email }}</p>
+<p><strong>Role:</strong> {{ profile.user.role }}</p>
+
+<hr>
+
+<p><strong>Phone:</strong> {{ profile.phone|default:"Not set" }}</p>
+<p><strong>Date of Birth:</strong> {{ profile.date_of_birth|default:"Not set" }}</p>
+<p><strong>Gender:</strong> {{ profile.get_gender_display|default:"Not set" }}</p>
+<p><strong>Blood Group:</strong> {{ profile.blood_group|default:"Not set" }}</p>
+
+<h3>Medical Information</h3>
+<p><strong>Allergies:</strong><br>{{ profile.allergies|default:"None" }}</p>
+<p><strong>Chronic Conditions:</strong><br>{{ profile.chronic_conditions|default:"None" }}</p>
+
+<hr>
+<p><em>Created: {{ profile.created_at }}</em></p>
+
+<a href="{% url 'patients:profile_edit' %}">Edit Profile</a> | 
+<a href="{% url 'patients:dashboard' %}">Back to Dashboard</a>
+{% endblock %}

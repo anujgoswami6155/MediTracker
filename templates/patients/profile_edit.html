@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>✏️ Edit Profile</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Save Changes</button>
+    <a href="{% url 'patients:profile' %}">Cancel</a>
+</form>
+{% endblock %}

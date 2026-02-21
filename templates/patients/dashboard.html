@@ -1,9 +1,66 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h2>Patient Dashboard</h2>
+<h2>👤 Patient Dashboard</h2>
+<p>Welcome, <strong>{{ patient.user.username }}</strong>!</p>
 
-<p><b>Username:</b> {{ patient.user.username }}</p>
-<p><b>Role:</b> {{ patient.user.role }}</p>
+<hr>
 
+<h3>📊 Quick Stats</h3>
+<ul>
+    <li>Active Schedules: {{ upcoming_schedules|length }}</li>
+    <li>Recent Logs: {{ recent_logs|length }}</li>
+    <li>Stored Documents: {{ documents_count }}</li>
+    <li>Pending Appointments: {{ appointments_count }}</li>
+</ul>
+
+<hr>
+
+<h3>⏰ Upcoming Medicine Schedule</h3>
+{% if upcoming_schedules %}
+    <ul>
+    {% for schedule in upcoming_schedules %}
+        <li>
+            <strong>{{ schedule.prescription_item.medicine.name }}</strong> 
+            at {{ schedule.time }}
+            {% if schedule.repeat_daily %}(Daily){% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+    <a href="{% url 'schedules:list' %}">View All Schedules</a>
+{% else %}
+    <p>No schedules yet. <a href="{% url 'schedules:create' %}">Create one</a></p>
+{% endif %}
+
+<hr>
+
+<h3>📝 Recent Intake Logs</h3>
+{% if recent_logs %}
+    <ul>
+    {% for log in recent_logs %}
+        <li>
+            {{ log.schedule.prescription_item.medicine.name }} - 
+            <strong>{{ log.status }}</strong> on {{ log.date }}
+        </li>
+    {% endfor %}
+    </ul>
+    <a href="{% url 'adherence:intake_list' %}">View All Logs</a>
+{% else %}
+    <p>No intake logs yet.</p>
+{% endif %}
+
+<hr>
+
+<h3>🔗 Quick Links</h3>
+<ul>
+    <li><a href="{% url 'patients:profile' %}">My Profile</a></li>
+    <li><a href="{% url 'schedules:list' %}">My Medicine Schedules</a></li>
+    <li><a href="{% url 'adherence:intake_list' %}">My Intake Logs</a></li>
+    <li><a href="{% url 'adherence:reminder_list' %}">My Reminders</a></li>
+    <li><a href="{% url 'documents:list' %}">My Documents</a></li>
+    <li><a href="{% url 'appointments:patient_list' %}">My Appointments</a></li>
+</ul>
+
+<hr>
+<a href="{% url 'accounts:logout' %}">Logout</a>
 {% endblock %}

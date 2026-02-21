@@ -1,12 +1,14 @@
 from django.shortcuts import render, redirect
-from django.contrib.auth import login, logout
-from django.contrib.auth.views import LoginView, LogoutView
+from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.views import LoginView
 from django.urls import reverse_lazy
 from django.views.generic import CreateView
+from django.views import View
 from .forms import UserRegisterForm
 from .models import User
 
 
+# 🔹 Signup View
 class UserRegisterView(CreateView):
     model = User
     form_class = UserRegisterForm
@@ -14,9 +16,9 @@ class UserRegisterView(CreateView):
     success_url = reverse_lazy("accounts:login")
 
 
+# 🔹 Login View
 class UserLoginView(LoginView):
     template_name = "accounts/login.html"
-    redirect_authenticated_user = True   
 
     def get_success_url(self):
         user = self.request.user
@@ -32,6 +34,9 @@ class UserLoginView(LoginView):
 
         return reverse_lazy("accounts:login")
 
-    
-class UserLogoutView(LogoutView):
-    next_page = reverse_lazy("accounts:login")
+
+# 🔹 Logout View (ALLOWS GET)
+def logout_view(request):
+    """Logout user and redirect to login"""
+    auth_logout(request)
+    return redirect('accounts:login')

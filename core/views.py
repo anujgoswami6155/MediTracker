@@ -54,3 +54,20 @@ def doctor_dashboard(request):
 @role_required("family")
 def family_dashboard(request):
     return render(request, "core/family_dashboard.html")
+
+from django.shortcuts import redirect
+
+def home(request):
+    """Smart homepage - redirects based on user status"""
+    if not request.user.is_authenticated:
+        return redirect('accounts:login')
+    
+    # User is logged in - redirect to their dashboard
+    if request.user.role == 'patient':
+        return redirect('core:patient_dashboard')
+    elif request.user.role == 'doctor':
+        return redirect('core:doctor_dashboard')
+    elif request.user.role == 'family':
+        return redirect('core:family_dashboard')
+    
+    return redirect('accounts:login')
