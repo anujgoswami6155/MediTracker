@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>💊 {{ medicine.name }}</h2>
+
+<h3>Medicine Details</h3>
+<p><strong>Generic Name:</strong> {{ medicine.generic_name|default:"N/A" }}</p>
+<p><strong>Strength:</strong> {{ medicine.strength|default:"N/A" }}</p>
+<p><strong>Form:</strong> {{ medicine.form|default:"N/A" }}</p>
+<p><strong>Manufacturer:</strong> {{ medicine.manufacturer|default:"N/A" }}</p>
+
+<hr>
+
+{% if my_prescriptions %}
+    <h3>My Prescriptions Using This Medicine</h3>
+    <ul>
+    {% for item in my_prescriptions %}
+        <li>
+            <strong>{{ item.dose }} {{ item.unit }}</strong> - {{ item.frequency }}
+            <br><em>From: <a href="{% url 'medicines:prescription_detail' item.prescription.pk %}">Prescription #{{ item.prescription.id }}</a></em>
+            {% if item.instructions %}<br>Instructions: {{ item.instructions }}{% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %}
+
+<hr>
+
+<p>
+    <a href="{% url 'medicines:edit' medicine.pk %}">✏️ Edit</a> |
+    <a href="{% url 'medicines:delete' medicine.pk %}">🗑️ Delete</a> |
+    <a href="{% url 'medicines:list' %}">⬅️ Back to List</a>
+</p>
+{% endblock %}

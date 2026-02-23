@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">💾 Create Prescription</button>
+    <a href="{% url 'medicines:prescriptions' %}">❌ Cancel</a>
+</form>
+
+<hr>
+
+<p><em>After creating the prescription, you can add medicines to it.</em></p>
+{% endblock %}

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>{{ title }}</h2>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">💾 Save</button>
+    <a href="{% if medicine %}{% url 'medicines:detail' medicine.pk %}{% else %}{% url 'medicines:list' %}{% endif %}">❌ Cancel</a>
+</form>
+
+<hr>
+
+<p><em>Add medicine to the global catalog. All users can see this.</em></p>
+{% endblock %}

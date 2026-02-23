@@ -8,10 +8,10 @@
 
 <h3>📊 Quick Stats</h3>
 <ul>
-    <li>Active Schedules: {{ upcoming_schedules|length }}</li>
-    <li>Recent Logs: {{ recent_logs|length }}</li>
-    <li>Stored Documents: {{ documents_count }}</li>
-    <li>Pending Appointments: {{ appointments_count }}</li>
+    <li><strong>Active Schedules:</strong> {{ upcoming_schedules|length }}</li>
+    <li><strong>Recent Logs:</strong> {{ recent_logs|length }}</li>
+    <li><strong>Stored Documents:</strong> {{ documents_count }}</li>
+    <li><strong>Pending Appointments:</strong> {{ appointments_count }}</li>
 </ul>
 
 <hr>
@@ -22,14 +22,14 @@
     {% for schedule in upcoming_schedules %}
         <li>
             <strong>{{ schedule.prescription_item.medicine.name }}</strong> 
-            at {{ schedule.time }}
-            {% if schedule.repeat_daily %}(Daily){% endif %}
+            at <strong>{{ schedule.time }}</strong>
+            {% if schedule.repeat_daily %} (Daily){% endif %}
         </li>
     {% endfor %}
     </ul>
-    <a href="{% url 'schedules:list' %}">View All Schedules</a>
+    <p><a href="{% url 'schedules:list' %}">📋 View All Schedules</a></p>
 {% else %}
-    <p>No schedules yet. <a href="{% url 'schedules:create' %}">Create one</a></p>
+    <p>No schedules yet. <a href="{% url 'schedules:create' %}">➕ Create one</a></p>
 {% endif %}
 
 <hr>
@@ -40,27 +40,29 @@
     {% for log in recent_logs %}
         <li>
             {{ log.schedule.prescription_item.medicine.name }} - 
-            <strong>{{ log.status }}</strong> on {{ log.date }}
+            <strong>{{ log.get_status_display }}</strong> on {{ log.date|date:"M d, Y" }}
         </li>
     {% endfor %}
     </ul>
-    <a href="{% url 'adherence:intake_list' %}">View All Logs</a>
+    <p><a href="{% url 'adherence:intake_list' %}">📋 View All Logs</a></p>
 {% else %}
-    <p>No intake logs yet.</p>
+    <p>No intake logs yet. <a href="{% url 'adherence:intake_create' %}">➕ Add one</a></p>
 {% endif %}
 
 <hr>
 
 <h3>🔗 Quick Links</h3>
 <ul>
-    <li><a href="{% url 'patients:profile' %}">My Profile</a></li>
-    <li><a href="{% url 'schedules:list' %}">My Medicine Schedules</a></li>
-    <li><a href="{% url 'adherence:intake_list' %}">My Intake Logs</a></li>
-    <li><a href="{% url 'adherence:reminder_list' %}">My Reminders</a></li>
-    <li><a href="{% url 'documents:list' %}">My Documents</a></li>
-    <li><a href="{% url 'appointments:patient_list' %}">My Appointments</a></li>
+    <li><a href="{% url 'patients:profile' %}">👤 My Profile</a></li>
+    <li><a href="{% url 'medicines:list' %}">💊 Medicine Catalog</a></li>
+    <li><a href="{% url 'medicines:prescriptions' %}">📋 My Prescriptions</a></li>
+    <li><a href="{% url 'schedules:list' %}">💊 My Medicine Schedules</a></li>
+    <li><a href="{% url 'adherence:intake_list' %}">✅ My Intake Logs</a></li>
+    <li><a href="{% url 'adherence:reminder_list' %}">🔔 My Reminders</a></li>
+    <li><a href="{% url 'documents:list' %}">📄 My Documents</a></li>
+    <li><a href="{% url 'appointments:patient_list' %}">📅 My Appointments</a></li>
 </ul>
 
 <hr>
-<a href="{% url 'accounts:logout' %}">Logout</a>
+<a href="{% url 'accounts:logout' %}">🚪 Logout</a>
 {% endblock %}

@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>➕ Add Medicine to Prescription</h2>
+
+<p>Adding medicine to <strong>Prescription #{{ prescription.id }}</strong></p>
+
+<hr>
+
+<form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">➕ Add Medicine</button>
+    <a href="{% url 'medicines:prescription_detail' prescription.pk %}">❌ Cancel</a>
+</form>
+
+<hr>
+
+<p><em>Don't see your medicine? <a href="{% url 'medicines:create' %}">Add it to the catalog first</a></em></p>
+{% endblock %}

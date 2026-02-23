@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>📋 My Prescriptions</h2>
+
+<p><a href="{% url 'medicines:prescription_create' %}">➕ Create New Prescription</a></p>
+
+<hr>
+
+{% if prescriptions %}
+    <ul>
+    {% for prescription in prescriptions %}
+        <li>
+            <strong><a href="{% url 'medicines:prescription_detail' prescription.pk %}">Prescription #{{ prescription.id }}</a></strong>
+            <br>Doctor: {{ prescription.doctor.username|default:"Not specified" }}
+            <br>Date: {{ prescription.created_at|date:"F d, Y" }}
+            <br>Medicines: {{ prescription.items.count }}
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No prescriptions yet. <a href="{% url 'medicines:prescription_create' %}">Create one</a></p>
+{% endif %}
+
+<hr>
+
+<p><a href="{% url 'patients:dashboard' %}">🏠 Back to Dashboard</a></p>
+{% endblock %}

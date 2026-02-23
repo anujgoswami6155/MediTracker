@@ -14,7 +14,8 @@ urlpatterns = [
     path('core/', include('core.urls')),
     
     # Patient Features
-    path('patients/', include('patients.urls')),        
+    path('patients/', include('patients.urls')),
+    path('medicines/', include('medicines.urls')),        
     path('schedules/', include('schedules.urls')),      
     path('adherence/', include('adherence.urls')),      
     path('documents/', include('documents.urls')),

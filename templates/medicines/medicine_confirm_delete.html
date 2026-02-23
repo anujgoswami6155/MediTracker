@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h2>🗑️ Delete Medicine</h2>
+
+<p>Are you sure you want to delete <strong>{{ medicine.name }}</strong>?</p>
+
+<p><em>Note: This will not delete the medicine entirely, just mark it as inactive. Existing prescriptions will still reference it.</em></p>
+
+<form method="post">
+    {% csrf_token %}
+    <button type="submit">✅ Yes, Delete</button>
+    <a href="{% url 'medicines:detail' medicine.pk %}">❌ Cancel</a>
+</form>
+{% endblock %}
