@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Dependent Requests</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-10">
+
+<h1 class="text-3xl font-bold mb-6">Dependent Requests</h1>
+
+{% if requests %}
+  <div class="space-y-4">
+    {% for link in requests %}
+      <div class="bg-white p-6 rounded shadow flex justify-between items-center">
+        <div>
+          <p class="font-semibold">
+            {{ link.family_member.username }}
+          </p>
+          <p class="text-sm text-gray-500">
+            Relation: {{ link.relation|default:"Family" }}
+          </p>
+        </div>
+
+        <div class="flex gap-4">
+          <a href="{% url 'patients:handle_dependent_request' link.id 'approve' %}"
+             class="bg-green-600 text-white px-4 py-2 rounded">
+            Approve
+          </a>
+
+          <a href="{% url 'patients:handle_dependent_request' link.id 'reject' %}"
+             class="bg-red-500 text-white px-4 py-2 rounded">
+            Reject
+          </a>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+{% else %}
+  <p class="text-gray-500">No pending requests.</p>
+{% endif %}
+
+</body>
+</html>

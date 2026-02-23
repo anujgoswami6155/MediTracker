@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+{% load static %}
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Request Add Dependent | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+
+<div class="bg-white p-8 rounded-xl shadow w-[420px]">
+
+  <h2 class="text-2xl font-bold mb-6 text-center">
+    Request Add Dependent
+  </h2>
+
+  <!-- ✅ MESSAGES -->
+  {% if messages %}
+    {% for message in messages %}
+      <div class="mb-4 p-3 rounded text-sm
+        {% if message.tags == 'error' %}bg-red-100 text-red-800{% endif %}
+        {% if message.tags == 'success' %}bg-green-100 text-green-800{% endif %}
+        {% if message.tags == 'warning' %}bg-yellow-100 text-yellow-800{% endif %}
+        {% if message.tags == 'info' %}bg-blue-100 text-blue-800{% endif %}
+      ">
+        {{ message }}
+      </div>
+    {% endfor %}
+  {% endif %}
+
+  <!-- FORM -->
+  <form method="post" class="space-y-4">
+    {% csrf_token %}
+
+    <input
+      type="text"
+      name="identifier"
+      placeholder="Patient Username or Email"
+      required
+      class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#3F8F6B]"
+    >
+
+    <input
+      type="text"
+      name="relation"
+      placeholder="Relation (Father, Mother, Guardian, etc.)"
+      class="w-full px-4 py-2 border rounded focus:outline-none focus:ring-2 focus:ring-[#3F8F6B]"
+    >
+
+    <button
+      type="submit"
+      class="w-full bg-[#3F8F6B] text-white py-2 rounded font-semibold hover:opacity-90 transition">
+      Submit Request
+    </button>
+  </form>
+
+  <div class="text-center mt-5">
+    <a href="{% url 'family:dashboard' %}"
+       class="text-sm text-blue-600 hover:underline">
+      ← Back to Dashboard
+    </a>
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -30,7 +30,7 @@ class UserLoginView(LoginView):
             return reverse_lazy("core:doctor_dashboard")
 
         elif user.role == "family":
-            return reverse_lazy("core:family_dashboard")
+            return reverse_lazy("family:dashboard")
 
         return reverse_lazy("accounts:login")
 

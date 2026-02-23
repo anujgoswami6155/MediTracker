@@ -1,8 +1,9 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect,get_object_or_404
 from core.decorators import role_required
 from .models import PatientProfile
 from .forms import PatientProfileForm
-
+from family.models import FamilyPatientLink
+from django.contrib import messages
 
 @role_required("patient")
 def dashboard(request):
@@ -66,3 +67,90 @@ def profile_edit(request):
         form = PatientProfileForm(instance=profile)
     
     return render(request, 'patients/profile_edit.html', {'form': form})
+
+@role_required("patient")
+def dependent_requests(request):
+    """
+    Patient can see all pending family access requests
+    """
+    requests = FamilyPatientLink.objects.filter(
+        patient__user=request.user,
+        status="pending"
+    ).select_related("family_member")
+
+    return render(
+        request,
+        "patients/dependent_requests.html",
+        {"requests": requests}
+    )
+
+
+@role_required("patient")
+def respond_dependent_request(request, pk, action):
+    """
+    Patient approves or rejects dependent request
+    """
+    link = get_object_or_404(
+        FamilyPatientLink,
+        pk=pk,
+        patient__user=request.user
+    )
+
+    if action == "approve":
+        link.status = "approved"
+        link.is_active = True
+
+    elif action == "reject":
+        link.status = "rejected"
+        link.is_active = False
+
+    link.save()
+    return redirect("patients:dependent_requests")
+
+
+
+@role_required("patient")
+def dependent_requests(request):
+
+    requests = FamilyPatientLink.objects.filter(
+        patient=request.user.patient_profile,
+        status="pending"
+    ).select_related("family_member")
+
+    return render(
+        request,
+        "patients/dependent_requests.html",
+        {"requests": requests}
+    )
+
+@role_required("patient")
+def handle_dependent_request(request, pk, action):
+
+    link = get_object_or_404(
+        FamilyPatientLink,
+        pk=pk,
+        patient=request.user.patient_profile,
+        status="pending"
+    )
+
+    if action == "approve":
+        link.status = "approved"
+        link.is_active = True
+        link.save(update_fields=["status", "is_active"])
+
+        messages.success(
+            request,
+            f"{link.family_member.username} is now linked to your account."
+        )
+
+    elif action == "reject":
+        link.status = "rejected"
+        link.is_active = False
+        link.save(update_fields=["status", "is_active"])
+
+        messages.info(
+            request,
+            "Dependent request rejected."
+        )
+
+    return redirect("patients:dependent_requests")

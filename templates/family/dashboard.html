@@ -4,8 +4,6 @@
 <head>
   <meta charset="UTF-8">
   <title>Family Dashboard | MediTracker</title>
-
-  <!-- Tailwind CDN (same as doctor dashboard) -->
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
@@ -20,32 +18,22 @@
       </div>
 
       <nav class="mt-6 space-y-1">
-
-        <!-- Dashboard -->
-        <a href="#"
-           class="flex items-center gap-3 px-6 py-3 rounded-r-full bg-[#3F8F6B]">
+        <a class="flex items-center gap-3 px-6 py-3 rounded-r-full bg-[#3F8F6B]">
           👨‍👩‍👧 Dashboard
         </a>
 
-        <!-- Monitor Patient -->
-        <a href="#"
-           class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+        <a class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
           🩺 Monitor Patient
         </a>
 
-        <!-- Alerts -->
-        <a href="#"
-           class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+        <a class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
           🔔 Alerts
         </a>
 
-        <!-- Adherence -->
-        <a href="#"
-           class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+        <a class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
           📊 Adherence Report
         </a>
 
-        <!-- Logout -->
         <form method="post" action="{% url 'accounts:logout' %}">
           {% csrf_token %}
           <button type="submit"
@@ -53,18 +41,16 @@
             🚪 Logout
           </button>
         </form>
-
       </nav>
     </div>
 
-    <!-- USER INFO -->
     <div class="px-6 py-6 border-t border-[#111827]">
       <p class="text-sm font-semibold">{{ request.user.username }}</p>
       <p class="text-xs text-gray-400">Family Member</p>
     </div>
   </aside>
 
-  <!-- MAIN CONTENT -->
+  <!-- MAIN -->
   <main class="flex-1 p-10">
 
     <!-- HEADER -->
@@ -77,66 +63,67 @@
 
     <!-- KPI CARDS -->
     <div class="grid grid-cols-3 gap-6 mb-10">
-
-      <!-- Dependents -->
       <div class="bg-white rounded-[20px] shadow p-6">
         <p class="text-sm text-[#6B7280]">Linked Patients</p>
         <p class="text-4xl font-bold text-[#3F8F6B] mt-2">
-          {{ dependents|length|default:"0" }}
+          {{ approved_count|default:"0" }}
         </p>
       </div>
 
-      <!-- Alerts -->
       <div class="bg-white rounded-[20px] shadow p-6">
-        <p class="text-sm text-[#6B7280]">Active Alerts</p>
-        <p class="text-4xl font-bold text-[#3F8F6B] mt-2">
-          0
+        <p class="text-sm text-[#6B7280]">Pending Requests</p>
+        <p class="text-4xl font-bold text-[#F59E0B] mt-2">
+          {{ pending_count|default:"0" }}
         </p>
       </div>
 
-      <!-- Adherence -->
       <div class="bg-white rounded-[20px] shadow p-6">
         <p class="text-sm text-[#6B7280]">Avg. Adherence</p>
-        <p class="text-4xl font-bold text-[#3F8F6B] mt-2">
-          0%
-        </p>
+        <p class="text-4xl font-bold text-[#3F8F6B] mt-2">0%</p>
       </div>
-
     </div>
+
+    <!-- ADD DEPENDENT -->
+    <a href="{% url 'family:request_dependent' %}"
+       class="inline-block mb-6 bg-[#3F8F6B] text-white px-4 py-2 rounded">
+      ➕ Request Add Dependent
+    </a>
 
     <!-- DEPENDENTS LIST -->
     <div class="bg-white rounded-[20px] shadow p-8 max-w-4xl">
+      <h2 class="text-lg font-semibold mb-4">My Dependents</h2>
 
-      <h2 class="text-lg font-semibold mb-4">
-        Linked Patients
-      </h2>
+      {% for link in links %}
+      <div class="flex justify-between items-center border-b py-4">
 
-      {% if dependents %}
-        <ul class="space-y-4">
-          {% for link in dependents %}
-            <li class="flex items-center justify-between border-b pb-3">
-              <div>
-                <p class="font-semibold text-[#0F172A]">
-                  {{ link.patient.user.get_full_name|default:link.patient.user.username }}
-                </p>
-                <p class="text-sm text-[#6B7280]">
-                  Relation: {{ link.relation|default:"Family Member" }}
-                </p>
-              </div>
+        <div>
+          <p class="font-semibold text-[#0F172A]">
+            {{ link.patient.user.get_full_name|default:link.patient.user.username }}
+          </p>
+          <p class="text-sm text-[#6B7280]">
+            Relation: {{ link.relation|default:"Family Member" }}
+          </p>
+        </div>
 
-              <a href="#"
-                 class="text-[#3F8F6B] font-semibold hover:underline">
-                View Details →
-              </a>
-            </li>
-          {% endfor %}
-        </ul>
-      {% else %}
-        <p class="text-[#6B7280]">
-          No patients linked yet.
-        </p>
-      {% endif %}
+        <!-- STATUS BADGE -->
+        {% if link.status == "pending" %}
+          <span class="px-3 py-1 text-sm rounded-full bg-yellow-100 text-yellow-800">
+            ⏳ Pending
+          </span>
+        {% elif link.status == "approved" %}
+          <span class="px-3 py-1 text-sm rounded-full bg-green-100 text-green-800">
+            ✅ Approved
+          </span>
+        {% else %}
+          <span class="px-3 py-1 text-sm rounded-full bg-red-100 text-red-800">
+            ❌ Rejected
+          </span>
+        {% endif %}
 
+      </div>
+      {% empty %}
+        <p class="text-[#6B7280]">No dependent requests yet.</p>
+      {% endfor %}
     </div>
 
   </main>

@@ -53,7 +53,7 @@ def doctor_dashboard(request):
 @login_required
 @role_required("family")
 def family_dashboard(request):
-    return render(request, "core/family_dashboard.html")
+    return render(request, "family/dashboard.html")
 
 from django.shortcuts import redirect
 
@@ -68,6 +68,6 @@ def home(request):
     elif request.user.role == 'doctor':
         return redirect('core:doctor_dashboard')
     elif request.user.role == 'family':
-        return redirect('core:family_dashboard')
+        return redirect('family:dashboard')
     
     return redirect('accounts:login')

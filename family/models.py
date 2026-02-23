@@ -3,8 +3,14 @@ from django.conf import settings
 
 User = settings.AUTH_USER_MODEL
 
-
 class FamilyPatientLink(models.Model):
+
+    STATUS_CHOICES = (
+        ("pending", "Pending"),
+        ("approved", "Approved"),
+        ("rejected", "Rejected"),
+    )
+
     family_member = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
@@ -13,7 +19,7 @@ class FamilyPatientLink(models.Model):
     )
 
     patient = models.ForeignKey(
-        "patients.PatientProfile",   # ✅ CORRECT MODEL NAME
+        "patients.PatientProfile",
         on_delete=models.CASCADE,
         related_name="family_links",
     )
@@ -24,11 +30,20 @@ class FamilyPatientLink(models.Model):
         help_text="Father, Mother, Guardian, Caregiver etc."
     )
 
-    is_active = models.BooleanField(default=True)
+    # ✅ NEW (required for Option 2)
+    status = models.CharField(
+        max_length=10,
+        choices=STATUS_CHOICES,
+        default="pending"
+    )
+
+    # ✅ active ONLY after approval
+    is_active = models.BooleanField(default=False)
+
     created_at = models.DateTimeField(auto_now_add=True)
 
     class Meta:
         unique_together = ("family_member", "patient")
 
     def __str__(self):
-        return f"{self.family_member} → {self.patient}"
+        return f"{self.family_member} → {self.patient} ({self.status})"
