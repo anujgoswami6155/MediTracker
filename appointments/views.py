@@ -1,16 +1,16 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from core.decorators import role_required
+from django.contrib import messages
 from .models import Appointment
 from .forms import AppointmentRequestForm, AppointmentDoctorUpdateForm
 from django.utils import timezone
 from datetime import timedelta
+from datetime import datetime
+from datetime import datetime, time
 
 
 
 
-# =====================================================
-# PATIENT SECTION
-# =====================================================
 
 @role_required("patient")
 def patient_appointments(request):
@@ -121,9 +121,9 @@ def update_appointment(request, pk):
     )
 
 
-# =====================================================
-# REVIEW APPOINTMENT (UPDATED WITH HISTORY + DOCS + INSTRUCTIONS)
-# =====================================================
+
+
+from datetime import datetime
 
 @role_required("doctor")
 def review_appointment(request, pk):
@@ -133,23 +133,77 @@ def review_appointment(request, pk):
         doctor=request.user
     )
 
-    # ✅ Medical History (ONLY previous approved visits)
+    now = timezone.now()
+
+    # Combine appointment date + time
+    appointment_datetime = datetime.combine(
+        appt.appointment_date,
+        appt.appointment_time
+    )
+    appointment_datetime = timezone.make_aware(appointment_datetime)
+
+    # Check if appointment is past but still approved
+    is_past_approved = (
+        appt.status == "approved" and
+        appointment_datetime < now
+    )
+
+    # Medical history
     history = Appointment.objects.filter(
         patient=appt.patient,
         status="approved",
-        appointment_date__lt=appt.appointment_date
-    ).order_by("-appointment_date")
+        appointment_date__lt=now.date()
+    ).exclude(
+        pk=appt.pk
+    ).order_by(
+        "-appointment_date",
+        "-appointment_time"
+    )
 
+    from documents.models import MedicalDocument
+
+    documents = MedicalDocument.objects.filter(
+        patient=appt.patient,
+        is_active=True
+    ).order_by("-uploaded_at")
+
+    # ================= POST LOGIC =================
     if request.method == "POST":
-        action = request.POST.get("action")
 
-        if action == "approve":
-            appt.status = "approved"
-            appt.save(update_fields=["status"])
+        # ❌ Do not allow modification if completed
+        if appt.status == "completed":
             return redirect("appointments:doctor_list")
 
-        if action == "reschedule":
+        action = request.POST.get("action")
+        notes = request.POST.get("doctor_notes")
+        follow_up = request.POST.get("follow_up_date")
+
+        # Save doctor notes
+        if notes is not None:
+            appt.doctor_notes = notes
+
+        # Save follow-up date safely
+        if follow_up:
+            appt.follow_up_date = datetime.strptime(
+                follow_up, "%Y-%m-%d"
+            ).date()
+        else:
+            appt.follow_up_date = None
+
+        # Handle actions
+        if action == "approve":
+            appt.status = "approved"
+
+        elif action == "complete":
+            appt.status = "completed"
+
+        elif action == "reschedule":
             return redirect("appointments:doctor_reschedule", pk=appt.pk)
+
+        appt.save()
+
+        messages.success(request, "Appointment updated successfully.")
+        return redirect("appointments:doctor_list")
 
     return render(
         request,
@@ -157,9 +211,10 @@ def review_appointment(request, pk):
         {
             "appointment": appt,
             "history": history,
+            "documents": documents,
+            "is_past_approved": is_past_approved,
         }
     )
-
 
 @role_required("doctor")
 def appointment_details(request, pk):
@@ -184,23 +239,58 @@ def reschedule_appointment(request, pk):
         doctor=request.user
     )
 
+    today = timezone.localdate()
+
     if request.method == "POST":
         new_date = request.POST.get("appointment_date")
         new_time = request.POST.get("appointment_time")
 
-        if new_date and new_time:
-            appt.appointment_date = new_date
-            appt.appointment_time = new_time
-            appt.status = "approved"
-            appt.save(update_fields=[
-                "appointment_date",
-                "appointment_time",
-                "status"
-            ])
-            return redirect("appointments:doctor_list")
+        # ---------------- DATE VALIDATION ----------------
+        if not new_date:
+            messages.error(request, "Please select a date.")
+            return redirect("appointments:doctor_reschedule", pk=appt.pk)
+
+        new_date_obj = datetime.strptime(new_date, "%Y-%m-%d").date()
+
+        if new_date_obj < today:
+            messages.error(request, "You cannot select a past date.")
+            return redirect("appointments:doctor_reschedule", pk=appt.pk)
+
+        # ---------------- TIME VALIDATION ----------------
+        if not new_time:
+            messages.error(request, "Please select a time.")
+            return redirect("appointments:doctor_reschedule", pk=appt.pk)
+
+        hour, minute = map(int, new_time.split(":"))
+        selected_time = time(hour, minute)
+
+        if selected_time < time(7, 0) or selected_time > time(20, 0):
+            messages.error(request, "Time must be between 7:00 AM and 8:00 PM.")
+            return redirect("appointments:doctor_reschedule", pk=appt.pk)
+
+        if minute not in [0, 15, 30, 45]:
+            messages.error(request, "Time must be in 15 minute intervals.")
+            return redirect("appointments:doctor_reschedule", pk=appt.pk)
+
+        # ---------------- SAVE ----------------
+        appt.appointment_date = new_date_obj
+        appt.appointment_time = selected_time
+        appt.status = "approved"
+
+        appt.save(update_fields=[
+            "appointment_date",
+            "appointment_time",
+            "status"
+        ])
+
+        messages.success(request, "Appointment rescheduled successfully.")
+        return redirect("appointments:doctor_list")
 
     return render(
         request,
         "doctor/reschedule_appointment.html",
-        {"appointment": appt}
+        {
+            "appointment": appt,
+            "today": today,
+        }
     )
