@@ -48,6 +48,7 @@ INSTALLED_APPS = [
     "instructions",
     "monitoring",
     "core",
+    'family',
     
 ]
 

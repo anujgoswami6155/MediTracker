@@ -19,6 +19,7 @@ urlpatterns = [
     path('adherence/', include('adherence.urls')),      
     path('documents/', include('documents.urls')),
     path('appointments/', include('appointments.urls')),
+    path("family/", include("family.urls")),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
