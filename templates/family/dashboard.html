@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-{% load static %}
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -7,123 +6,214 @@
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-[#F7FAFC] font-sans">
+<body class="bg-slate-100 font-sans">
 <div class="flex min-h-screen">
 
   <!-- SIDEBAR -->
   <aside class="w-64 bg-[#0E1626] text-white flex flex-col justify-between">
+
+    <!-- TOP -->
     <div>
-      <div class="flex items-center gap-2 px-6 py-6 text-xl font-bold text-emerald-400">
+      <!-- LOGO -->
+      <div class="px-6 py-6 text-xl font-bold text-emerald-400">
         💚 MediTracker
       </div>
 
-      <nav class="mt-6 space-y-1">
-        <a class="flex items-center gap-3 px-6 py-3 rounded-r-full bg-[#3F8F6B]">
-          👨‍👩‍👧 Dashboard
+      <!-- PATIENT SWITCHER (UI ONLY) -->
+      <div class="px-6 mb-6">
+        <p class="text-xs text-gray-400 mb-1">Managing</p>
+        <div class="bg-[#111827] px-3 py-2 rounded flex justify-between items-center cursor-pointer">
+          <span class="text-sm">All Dependents</span>
+          <span class="text-gray-400">⌄</span>
+        </div>
+      </div>
+
+      <!-- NAVIGATION -->
+      <nav class="space-y-1 text-sm">
+
+        <a class="flex items-center gap-3 px-6 py-3 bg-[#3F8F6B] rounded-r-full">
+          🏠 Dashboard
         </a>
 
-        <a class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
-          🩺 Monitor Patient
+        <a href="#" class="flex items-center gap-3 px-6 py-3 hover:bg-[#111827]">
+          👨‍👩‍👧 All Dependents
         </a>
 
-        <a class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
-          🔔 Alerts
+        <a href="#" class="flex items-center gap-3 px-6 py-3 hover:bg-[#111827]">
+          📅 Appointments
         </a>
 
-        <a class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
-          📊 Adherence Report
+        <a href="#" class="flex items-center gap-3 px-6 py-3 hover:bg-[#111827]">
+          💊 Medicines
         </a>
 
-        <form method="post" action="{% url 'accounts:logout' %}">
-          {% csrf_token %}
-          <button type="submit"
-                  class="w-full flex items-center gap-3 px-6 py-3 text-red-400 hover:bg-[#111827]">
-            🚪 Logout
-          </button>
-        </form>
+        <a href="#" class="flex items-center gap-3 px-6 py-3 hover:bg-[#111827]">
+          📄 Documents
+        </a>
+
+        <div class="mt-4 border-t border-[#1F2937]"></div>
+
+        <a href="#" class="flex items-center gap-3 px-6 py-3 hover:bg-[#111827]">
+          🚨 Emergency Info
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-6 py-3 hover:bg-[#111827]">
+          📊 Insights
+        </a>
+
+        <a href="#" class="flex items-center gap-3 px-6 py-3 hover:bg-[#111827]">
+          ⚙ Settings
+        </a>
       </nav>
     </div>
 
-    <div class="px-6 py-6 border-t border-[#111827]">
-      <p class="text-sm font-semibold">{{ request.user.username }}</p>
-      <p class="text-xs text-gray-400">Family Member</p>
+    <!-- SIDEBAR FOOTER -->
+    <div class="px-6 py-5 border-t border-[#1F2937] space-y-4">
+      <div class="text-xs text-gray-400 space-y-1">
+        <p>✔ {{ approved_count }} Dependents</p>
+        <p>✔ {{ upcoming_appointments|length }} Upcoming Appointments</p>
+        <p>✔ {{ today_medicines_count }} Medicine(s) Today</p>
+      </div>
+
+      <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button class="w-full text-left text-red-400 hover:text-red-300">
+          🚪 Logout
+        </button>
+      </form>
+
+      <div class="text-xs text-gray-500">
+        {{ request.user.username }}<br>
+        Family Member
+      </div>
     </div>
   </aside>
 
-  <!-- MAIN -->
-  <main class="flex-1 p-10">
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 p-10 space-y-10">
 
     <!-- HEADER -->
-    <h1 class="text-4xl font-bold text-[#0F172A] mb-2">
-      Welcome, {{ request.user.username }} 👋
-    </h1>
-    <p class="text-[#6B7280] mb-10">
-      Monitor and support your family’s health
-    </p>
-
-    <!-- KPI CARDS -->
-    <div class="grid grid-cols-3 gap-6 mb-10">
-      <div class="bg-white rounded-[20px] shadow p-6">
-        <p class="text-sm text-[#6B7280]">Linked Patients</p>
-        <p class="text-4xl font-bold text-[#3F8F6B] mt-2">
-          {{ approved_count|default:"0" }}
+    <div class="flex justify-between items-center">
+      <div>
+        <h1 class="text-3xl font-bold">
+          Welcome, {{ request.user.username }} 👋
+        </h1>
+        <p class="text-gray-500">
+          Overview of your family’s health activity
         </p>
       </div>
 
-      <div class="bg-white rounded-[20px] shadow p-6">
-        <p class="text-sm text-[#6B7280]">Pending Requests</p>
-        <p class="text-4xl font-bold text-[#F59E0B] mt-2">
-          {{ pending_count|default:"0" }}
+      <!-- Notification Bell (UI only) -->
+      <button class="relative bg-white p-3 rounded-full shadow">
+        🔔
+        <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
+      </button>
+    </div>
+
+    <!-- STATS -->
+    <div class="grid grid-cols-4 gap-6">
+      <div class="bg-white rounded-xl p-5 shadow">
+        <p class="text-sm text-gray-500">Linked Patients</p>
+        <p class="text-3xl font-bold text-emerald-600">
+          {{ approved_count }}
         </p>
       </div>
 
-      <div class="bg-white rounded-[20px] shadow p-6">
-        <p class="text-sm text-[#6B7280]">Avg. Adherence</p>
-        <p class="text-4xl font-bold text-[#3F8F6B] mt-2">0%</p>
+      <div class="bg-white rounded-xl p-5 shadow">
+        <p class="text-sm text-gray-500">Pending Requests</p>
+        <p class="text-3xl font-bold text-yellow-500">
+          {{ pending_count }}
+        </p>
+      </div>
+
+      <div class="bg-white rounded-xl p-5 shadow">
+        <p class="text-sm text-gray-500">Upcoming Appointments</p>
+        <p class="text-3xl font-bold text-blue-600">
+          {{ upcoming_appointments|length }}
+        </p>
+      </div>
+
+      <div class="bg-white rounded-xl p-5 shadow">
+        <p class="text-sm text-gray-500">Today’s Medicines</p>
+        <p class="text-3xl font-bold text-purple-600">
+          {{ today_medicines_count }}
+        </p>
       </div>
     </div>
 
-    <!-- ADD DEPENDENT -->
-    <a href="{% url 'family:request_dependent' %}"
-       class="inline-block mb-6 bg-[#3F8F6B] text-white px-4 py-2 rounded">
-      ➕ Request Add Dependent
-    </a>
+    <!-- UPCOMING APPOINTMENTS -->
+    <div class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-lg font-semibold mb-4">📅 Upcoming Appointments</h2>
 
-    <!-- DEPENDENTS LIST -->
-    <div class="bg-white rounded-[20px] shadow p-8 max-w-4xl">
-      <h2 class="text-lg font-semibold mb-4">My Dependents</h2>
-
-      {% for link in links %}
-      <div class="flex justify-between items-center border-b py-4">
-
-        <div>
-          <p class="font-semibold text-[#0F172A]">
-            {{ link.patient.user.get_full_name|default:link.patient.user.username }}
-          </p>
-          <p class="text-sm text-[#6B7280]">
-            Relation: {{ link.relation|default:"Family Member" }}
-          </p>
-        </div>
-
-        <!-- STATUS BADGE -->
-        {% if link.status == "pending" %}
-          <span class="px-3 py-1 text-sm rounded-full bg-yellow-100 text-yellow-800">
-            ⏳ Pending
-          </span>
-        {% elif link.status == "approved" %}
-          <span class="px-3 py-1 text-sm rounded-full bg-green-100 text-green-800">
-            ✅ Approved
-          </span>
-        {% else %}
-          <span class="px-3 py-1 text-sm rounded-full bg-red-100 text-red-800">
-            ❌ Rejected
-          </span>
-        {% endif %}
-
-      </div>
+      {% for appt in upcoming_appointments %}
+        <p class="text-sm text-gray-700">
+          • {{ appt.patient.username }} —
+          {{ appt.appointment_date }} {{ appt.appointment_time }}
+        </p>
       {% empty %}
-        <p class="text-[#6B7280]">No dependent requests yet.</p>
+        <p class="text-sm text-gray-400">
+          No upcoming appointments
+        </p>
       {% endfor %}
+    </div>
+
+    <!-- DEPENDENTS -->
+    <div>
+      <div class="flex justify-between items-center mb-4">
+        <h2 class="text-lg font-semibold">My Dependents</h2>
+        <a href="{% url 'family:request_dependent' %}"
+           class="bg-emerald-600 text-white px-4 py-2 rounded-lg">
+          ➕ Add Dependent
+        </a>
+      </div>
+
+      <div class="space-y-4">
+        {% for link in links %}
+          <div class="bg-white rounded-xl shadow p-5 flex justify-between items-center">
+            <div>
+              <p class="font-semibold text-lg">
+                {{ link.patient.user.get_full_name|default:link.patient.user.username }}
+              </p>
+              <p class="text-sm text-gray-500">
+                {{ link.relation|default:"Family Member" }}
+              </p>
+            </div>
+
+            <div class="flex gap-3">
+              <a href="{% url 'family:patient_overview' link.patient.id %}"
+                 class="px-3 py-2 bg-slate-100 rounded hover:bg-slate-200">
+                Overview
+              </a>
+              <a href="{% url 'family:view_patient_medicines' link.patient.id %}"
+                 class="px-3 py-2 bg-slate-100 rounded hover:bg-slate-200">
+                Medicines
+              </a>
+              <a href="{% url 'family:patient_appointments' link.patient.id %}"
+                 class="px-3 py-2 bg-slate-100 rounded hover:bg-slate-200">
+                Appointments
+              </a>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- OPTIONAL UI PLACEHOLDERS -->
+    <div class="grid grid-cols-3 gap-6">
+      <div class="bg-white rounded-xl p-5 shadow">
+        <h3 class="font-semibold mb-2">❤️ Health Alerts</h3>
+        <p class="text-sm text-gray-400">No critical alerts</p>
+      </div>
+
+      <div class="bg-white rounded-xl p-5 shadow">
+        <h3 class="font-semibold mb-2">💊 Medicine Adherence</h3>
+        <p class="text-sm text-gray-400">Coming soon</p>
+      </div>
+
+      <div class="bg-white rounded-xl p-5 shadow">
+        <h3 class="font-semibold mb-2">📞 Emergency Contact</h3>
+        <p class="text-sm text-gray-400">Not set</p>
+      </div>
     </div>
 
   </main>

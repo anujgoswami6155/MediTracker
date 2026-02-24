@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patient Medicine Schedules</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F7FAFC] font-sans p-10">
+
+  <!-- HEADER -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-[#0F172A]">
+      Medicine Schedules –
+      {{ patient.user.get_full_name|default:patient.user.username }}
+    </h1>
+    <p class="text-sm text-gray-500 mt-1">
+      🔒 Read‑only access
+    </p>
+  </div>
+
+  <!-- SCHEDULE LIST -->
+  {% if schedules %}
+    <div class="bg-white rounded-[20px] shadow p-6 max-w-4xl">
+
+      <table class="w-full border-collapse">
+        <thead>
+          <tr class="text-left text-sm text-gray-500 border-b">
+            <th class="py-2">Medicine</th>
+            <th class="py-2">Time</th>
+            <th class="py-2">Start Date</th>
+            <th class="py-2">End Date</th>
+            <th class="py-2">Repeat</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for schedule in schedules %}
+            <tr class="border-b last:border-none">
+              <td class="py-3 font-semibold text-[#0F172A]">
+                {{ schedule.prescription_item.medicine.name }}
+                {% if schedule.prescription_item.medicine.strength %}
+                  ({{ schedule.prescription_item.medicine.strength }})
+                {% endif %}
+              </td>
+
+              <td class="py-3">
+                {{ schedule.time }}
+              </td>
+
+              <td class="py-3">
+                {{ schedule.start_date }}
+              </td>
+
+              <td class="py-3">
+                {{ schedule.end_date|default:"—" }}
+              </td>
+
+              <td class="py-3">
+                {% if schedule.repeat_daily %}
+                  Daily
+                {% else %}
+                  Custom
+                {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+
+    </div>
+  {% else %}
+    <p class="text-gray-600">
+      No active medicine schedules found for this patient.
+    </p>
+  {% endif %}
+
+  <!-- BACK -->
+  <div class="mt-10">
+    <a href="{% url 'family:patient_overview' patient.id %}"
+   class="text-green-700 font-semibold">
+  ← Back to Patient Overview
+</a>
+  </div>
+
+</body>
+</html>

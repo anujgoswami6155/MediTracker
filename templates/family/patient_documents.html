@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Patient Documents</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 p-10">
+  <h1 class="text-3xl font-bold mb-6">
+    Documents – {{ patient.user.username }}
+  </h1>
+
+  <p class="text-sm text-gray-500 mb-6">🔒 Read‑only access</p>
+
+  {% if documents %}
+    <div class="space-y-4 max-w-3xl">
+      {% for doc in documents %}
+        <div class="bg-white p-6 rounded-xl shadow">
+          <p class="font-semibold">{{ doc.title|default:"Medical Document" }}</p>
+          <p class="text-sm text-gray-600">
+            Type: {{ doc.get_document_type_display }}
+          </p>
+          <p class="text-sm text-gray-500">
+            Uploaded: {{ doc.uploaded_at|date:"d M Y" }}
+          </p>
+
+          <a href="{{ doc.file.url }}"
+             class="text-green-600 font-semibold mt-3 inline-block"
+             target="_blank">
+            Download →
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <p class="text-gray-500">No documents available.</p>
+  {% endif %}
+
+  <a href="{% url 'family:patient_overview' patient.id %}"
+   class="text-green-700 font-semibold">
+  ← Back to Patient Overview
+</a>
+</body>
+</html>

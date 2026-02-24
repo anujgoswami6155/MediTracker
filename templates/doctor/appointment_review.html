@@ -53,7 +53,13 @@
 <main class="flex-1 p-10">
 
 <h1 class="text-3xl font-bold mb-8">Review Appointment</h1>
-
+ {% if appointment.created_by_family %}
+  <div class="bg-blue-50 border border-blue-200 text-blue-800
+              px-6 py-4 rounded-xl mb-8">
+    👨‍👩‍👧 <b>Booked by Family Member:</b>
+    {{ appointment.created_by_family.get_full_name|default:appointment.created_by_family.username }}
+  </div>
+{% endif %}
 <!-- APPOINTMENT SUMMARY -->
 <div class="bg-white rounded-[20px] shadow p-6 mb-8">
   <h2 class="font-semibold mb-4">Appointment Details</h2>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Patient Overview | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-50 p-10">
+
+<!-- HEADER -->
+<div class="mb-8">
+  <h1 class="text-3xl font-bold text-gray-900">
+    {{ patient.user.get_full_name|default:patient.user.username }}
+  </h1>
+  <p class="text-gray-600 mt-1">
+    Patient Overview • Managed by Family
+  </p>
+</div>
+
+<!-- STATS -->
+<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+
+  <div class="bg-white rounded-xl shadow p-6">
+    <p class="text-sm text-gray-500">Appointments</p>
+    <p class="text-3xl font-bold text-emerald-600">
+      {{ appointment_count }}
+    </p>
+  </div>
+
+  <div class="bg-white rounded-xl shadow p-6">
+    <p class="text-sm text-gray-500">Prescriptions</p>
+    <p class="text-3xl font-bold text-blue-600">
+      {{ prescription_count }}
+    </p>
+  </div>
+
+  <div class="bg-white rounded-xl shadow p-6">
+    <p class="text-sm text-gray-500">Documents</p>
+    <p class="text-3xl font-bold text-purple-600">
+      {{ document_count }}
+    </p>
+  </div>
+
+  <div class="bg-white rounded-xl shadow p-6">
+    <p class="text-sm text-gray-500">Status</p>
+    <p class="text-2xl font-semibold text-green-600">
+      Active
+    </p>
+  </div>
+
+</div>
+
+<!-- ACTION CARDS -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+
+  <a href="{% url 'family:view_patient_profile' patient.id %}"
+     class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition">
+    <h3 class="font-semibold text-lg">👤 Patient Profile</h3>
+    <p class="text-sm text-gray-600 mt-1">
+      Personal & medical details
+    </p>
+  </a>
+
+  <a href="{% url 'family:patient_appointments' patient.id %}"
+     class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition">
+    <h3 class="font-semibold text-lg">📅 Appointments</h3>
+    <p class="text-sm text-gray-600 mt-1">
+      View & manage appointments
+    </p>
+  </a>
+
+  <a href="{% url 'family:view_patient_medicines' patient.id %}"
+     class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition">
+    <h3 class="font-semibold text-lg">💊 Medicines</h3>
+    <p class="text-sm text-gray-600 mt-1">
+      Prescriptions & medicines
+    </p>
+  </a>
+
+  <a href="{% url 'family:view_patient_schedules' patient.id %}"
+     class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition">
+    <h3 class="font-semibold text-lg">⏰ Schedules</h3>
+    <p class="text-sm text-gray-600 mt-1">
+      Medication schedules
+    </p>
+  </a>
+
+  <a href="{% url 'family:view_patient_documents' patient.id %}"
+     class="bg-white rounded-xl shadow p-6 hover:shadow-lg transition">
+    <h3 class="font-semibold text-lg">📄 Documents</h3>
+    <p class="text-sm text-gray-600 mt-1">
+      Reports & uploads
+    </p>
+  </a>
+
+</div>
+
+<!-- BACK -->
+<a href="{% url 'family:dashboard' %}"
+   class="text-emerald-600 font-semibold">
+  ← Back to Family Dashboard
+</a>
+
+</body>
+</html>

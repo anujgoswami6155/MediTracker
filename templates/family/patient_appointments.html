@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patient Appointments</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-8">
+
+<!-- HEADER -->
+<div class="mb-6">
+  <h2 class="text-2xl font-semibold text-gray-800">
+    Appointments — {{ patient.user.get_full_name|default:patient.user.username }}
+  </h2>
+  <p class="text-sm text-gray-500">
+    Managed by family member
+  </p>
+</div>
+
+<!-- CREATE APPOINTMENT -->
+{% if can_manage %}
+  <a href="{% url 'family:create_appointment' patient.id %}"
+     class="inline-block mb-6 bg-emerald-600 hover:bg-emerald-700
+            text-white px-4 py-2 rounded-lg font-semibold transition">
+    ➕ Create Appointment
+  </a>
+{% endif %}
+
+<!-- APPOINTMENTS LIST -->
+<div class="bg-white rounded-lg shadow divide-y">
+
+  {% for appointment in appointments %}
+    <div class="p-5 flex justify-between items-center">
+
+      <!-- LEFT INFO -->
+      <div>
+        <p class="font-semibold text-gray-800">
+          {{ appointment.appointment_date|date:"d M Y" }},
+          {{ appointment.appointment_time|time:"h:i A" }}
+        </p>
+
+        <p class="text-sm text-gray-600 mt-1">
+          Status:
+          <span class="font-medium">
+            {{ appointment.status|title }}
+          </span>
+        </p>
+
+        {% if appointment.doctor %}
+          <p class="text-sm text-gray-500 mt-1">
+            Doctor:
+            {{ appointment.doctor.get_full_name|default:appointment.doctor.username }}
+          </p>
+        {% else %}
+          <p class="text-sm text-gray-400 italic mt-1">
+            Doctor not assigned yet
+          </p>
+        {% endif %}
+      </div>
+
+ <!-- RIGHT ACTIONS -->
+<div class="flex items-center gap-3">
+
+  {% if appointment.status == "requested" %}
+    <form method="post"
+          action="{% url 'family:cancel_appointment' patient.id appointment.id %}">
+      {% csrf_token %}
+      <button
+        class="bg-red-500 hover:bg-red-600 text-white
+               px-4 py-2 rounded-lg font-semibold transition">
+        Cancel
+      </button>
+    </form>
+
+  {% elif appointment.status == "approved" %}
+    <span class="px-3 py-1 text-sm rounded-full
+                 bg-blue-100 text-blue-700 font-medium">
+      Approved
+    </span>
+
+  {% elif appointment.status == "cancelled" %}
+    <span class="px-3 py-1 text-sm rounded-full
+                 bg-red-100 text-red-600 font-medium">
+      Cancelled
+    </span>
+
+  {% elif appointment.status == "completed" %}
+    <span class="px-3 py-1 text-sm rounded-full
+                 bg-green-100 text-green-700 font-medium">
+      Completed
+    </span>
+
+  {% endif %}
+
+</div>
+
+    </div>
+
+  {% empty %}
+    <p class="p-6 text-gray-500 text-center">
+      No appointments found.
+    </p>
+  {% endfor %}
+
+</div>
+
+<!-- BACK -->
+<a href="{% url 'family:patient_overview' patient.id %}"
+   class="inline-block mt-6 text-emerald-700 font-semibold hover:underline">
+  ← Back to Patient Overview
+</a>
+
+</body>
+</html>

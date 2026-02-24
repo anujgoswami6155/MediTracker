@@ -65,6 +65,7 @@
   <div class="flex items-center justify-between border-b pb-6 last:border-none">
 
     <!-- LEFT SIDE (Patient Info) -->
+     
     <div>
       <p class="text-lg font-semibold text-[#0F172A]">
         {{ appt.patient.get_full_name|default:appt.patient.username }}
@@ -74,7 +75,12 @@
         {{ appt.appointment_date|date:"d M Y" }} •
         {{ appt.appointment_time|time:"h:i A" }}
       </p>
-
+      {% if appt.created_by_family %}
+      <p class="text-xs text-blue-600 mt-1">
+    👨‍👩‍👧 Booked by family:
+    {{ appt.created_by_family.get_full_name|default:appt.created_by_family.username }}
+     </p>
+      {% endif %}
       <!-- STATUS BADGE -->
       <div class="mt-2">
         {% if appt.status == "pending" %}

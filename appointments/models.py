@@ -45,6 +45,14 @@ class Appointment(models.Model):
 
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
-
+    
+    created_by_family = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.SET_NULL,
+    null=True,
+    blank=True,
+    related_name="appointments_created_for_family",
+    limit_choices_to={"role": "family"},
+    )
     def __str__(self):
         return f"{self.patient} → {self.doctor} ({self.status})"

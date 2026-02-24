@@ -5,6 +5,7 @@ User = settings.AUTH_USER_MODEL
 
 class FamilyPatientLink(models.Model):
 
+
     STATUS_CHOICES = (
         ("pending", "Pending"),
         ("approved", "Approved"),
@@ -41,6 +42,8 @@ class FamilyPatientLink(models.Model):
     is_active = models.BooleanField(default=False)
 
     created_at = models.DateTimeField(auto_now_add=True)
+
+    can_manage_appointments = models.BooleanField(default=False)
 
     class Meta:
         unique_together = ("family_member", "patient")

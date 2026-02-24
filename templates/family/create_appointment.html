@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Create Appointment</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-gray-100 p-10">
+
+<h2 class="text-2xl font-semibold mb-4">
+  Create Appointment — {{ patient.user.get_full_name|default:patient.user.username }}
+</h2>
+{% if form.non_field_errors %}
+  <div class="mb-6 rounded-lg border border-red-300 bg-red-50 px-4 py-3">
+    <p class="text-sm font-semibold text-red-700">
+      ⚠ {{ form.non_field_errors.0 }}
+    </p>
+  </div>
+{% endif %}
+<form method="post" class="bg-white p-6 rounded shadow max-w-lg">
+  {% csrf_token %}
+
+  {{ form.as_p }}
+
+  <div class="flex gap-4 mt-6">
+    <button type="submit"
+            class="bg-emerald-600 text-white px-6 py-2 rounded hover:opacity-90">
+      Request Appointment
+    </button>
+
+    <a href="{% url 'family:patient_appointments' patient.id %}"
+       class="px-6 py-2 rounded border">
+      Cancel
+    </a>
+  </div>
+</form>
+
+</body>
+</html>
