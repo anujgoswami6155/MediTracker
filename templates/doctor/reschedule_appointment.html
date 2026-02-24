@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+{% load static %}
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -11,43 +12,71 @@
 
   <!-- SIDEBAR -->
   <aside class="w-64 bg-[#0E1626] text-white flex flex-col justify-between">
+
+    <!-- TOP -->
     <div>
       <div class="flex items-center gap-2 px-6 py-6 text-xl font-bold text-emerald-400">
         💚 MediTracker
       </div>
 
       <nav class="mt-6 space-y-1">
+
         <a href="{% url 'core:doctor_dashboard' %}"
            class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
           🏠 Dashboard
         </a>
+
         <a href="{% url 'appointments:doctor_list' %}"
            class="flex items-center gap-3 px-6 py-3 rounded-r-full bg-[#3F8F6B]">
           📅 Appointments
         </a>
+
       </nav>
     </div>
 
-    <div class="px-6 py-6 border-t border-[#111827]">
-      <p class="text-sm font-semibold">{{ request.user }}</p>
-      <p class="text-xs text-gray-400">Doctor</p>
+    <!-- BOTTOM (User + Logout) -->
+    <div class="px-6 py-6 border-t border-[#111827] space-y-4">
+
+      <div>
+        <p class="text-sm font-semibold">{{ request.user }}</p>
+        <p class="text-xs text-gray-400">Doctor</p>
+      </div>
+
+      <!-- 🔴 Logout Button -->
+      <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button type="submit"
+                class="w-full bg-red-500 hover:bg-red-600
+                       text-white py-2 rounded-lg
+                       text-sm font-semibold transition">
+          🚪 Logout
+        </button>
+      </form>
+
     </div>
   </aside>
 
   <!-- MAIN -->
   <main class="flex-1 p-10">
 
+    <!-- PAGE HEADER -->
     <div class="mb-8">
-      <h1 class="text-3xl font-bold text-[#0F172A]">Reschedule Appointment</h1>
-      <p class="text-[#6B7280] mt-1">Update the appointment date or time if required</p>
+      <h1 class="text-3xl font-bold text-[#0F172A]">
+        Reschedule Appointment
+      </h1>
+      <p class="text-[#6B7280] mt-1">
+        Update the appointment date or time if required
+      </p>
     </div>
 
     <!-- CURRENT APPOINTMENT INFO -->
     <div class="bg-white rounded-[20px] shadow-[0_10px_25px_rgba(15,23,42,0.08)]
                 p-6 mb-8 max-w-4xl">
-      <h2 class="text-lg font-semibold mb-4">Current Appointment Details</h2>
+      <h2 class="text-lg font-semibold mb-4">
+        Current Appointment Details
+      </h2>
 
-      <div class="grid grid-cols-3 gap-4 text-sm">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">   
         <p><b>Patient:</b> {{ appointment.patient }}</p>
         <p><b>Date:</b> {{ appointment.appointment_date }}</p>
         <p><b>Time:</b> {{ appointment.appointment_time }}</p>
@@ -55,7 +84,21 @@
       </div>
     </div>
 
-    <!-- ✅ RESCHEDULE FORM (THIS IS THE FIX) -->
+    <!-- MESSAGES -->
+    {% if messages %}
+      {% for message in messages %}
+        <div class="mb-6 p-4 rounded-xl text-sm font-medium
+                    {% if message.tags == 'error' %}
+                        bg-red-100 text-red-700
+                    {% else %}
+                        bg-green-100 text-green-700
+                    {% endif %}">
+          {{ message }}
+        </div>
+      {% endfor %}
+    {% endif %}
+
+    <!-- RESCHEDULE FORM -->
     <form method="post"
           class="bg-white rounded-[20px] shadow-[0_10px_25px_rgba(15,23,42,0.08)]
                  p-8 max-w-xl">
@@ -63,24 +106,93 @@
 
       <h2 class="text-lg font-semibold mb-6">New Schedule</h2>
 
+      <!-- NEW DATE -->
       <div class="mb-5">
-        <label class="block text-sm font-medium text-[#6B7280] mb-2">New Date</label>
-        <input type="date" name="appointment_date" required
-               class="w-full border border-[#E5E7EB] rounded-xl px-5 py-4
-                      focus:ring-2 focus:ring-[#4FAE8C] outline-none" />
+        <label class="block text-sm font-medium text-[#6B7280] mb-2">
+          New Date
+        </label>
+
+        <input type="date"
+               id="appointment_date"
+               name="appointment_date"
+               required
+               class="w-full border border-[#E5E7EB] rounded-xl px-4 py-3
+                      focus:ring-2 focus:ring-[#4FAE8C] outline-none">
+
+        <script>
+        document.addEventListener("DOMContentLoaded", function() {
+
+            const dateInput = document.getElementById("appointment_date");
+
+            const today = new Date();
+            const year = today.getFullYear();
+            const month = String(today.getMonth() + 1).padStart(2, '0');
+            const day = String(today.getDate()).padStart(2, '0');
+
+            const formattedToday = `${year}-${month}-${day}`;
+            dateInput.setAttribute("min", formattedToday);
+
+            dateInput.addEventListener("change", function() {
+                if (this.value < formattedToday) {
+                    this.value = formattedToday;
+                }
+            });
+        });
+        </script>
       </div>
 
+      <!-- NEW TIME -->
       <div class="mb-6">
-        <label class="block text-sm font-medium text-[#6B7280] mb-2">New Time</label>
-        <input type="time" name="appointment_time" required
-               class="w-full border border-[#E5E7EB] rounded-xl px-5 py-4
-                      focus:ring-2 focus:ring-[#4FAE8C] outline-none" />
+        <label class="block text-sm font-medium text-[#6B7280] mb-2">
+          New Time
+        </label>
+
+        <select id="appointment_time"
+                name="appointment_time"
+                required
+                class="w-full border border-[#E5E7EB] rounded-xl px-4 py-3
+                       focus:ring-2 focus:ring-[#4FAE8C] outline-none">
+
+            <option value="">Select Time</option>
+        </select>
       </div>
+
+      <script>
+      document.addEventListener("DOMContentLoaded", function() {
+
+          const select = document.getElementById("appointment_time");
+
+          let start = 7 * 60;
+          let end = 20 * 60;
+
+          for (let minutes = start; minutes <= end; minutes += 15) {
+
+              let hour = Math.floor(minutes / 60);
+              let minute = minutes % 60;
+
+              let hourFormatted = String(hour).padStart(2, '0');
+              let minuteFormatted = String(minute).padStart(2, '0');
+
+              let value = `${hourFormatted}:${minuteFormatted}`;
+
+              let displayHour = hour % 12 || 12;
+              let ampm = hour < 12 ? "AM" : "PM";
+
+              let option = document.createElement("option");
+              option.value = value;
+              option.textContent = `${displayHour}:${minuteFormatted} ${ampm}`;
+
+              select.appendChild(option);
+          }
+
+      });
+      </script>
 
       <p class="text-sm text-[#6B7280] mb-8">
         The patient will be notified automatically about the updated schedule.
       </p>
 
+      <!-- ACTION BUTTONS -->
       <div class="flex gap-4">
         <button type="submit"
                 class="bg-[#3F8F6B] text-white px-8 py-4 rounded-xl
@@ -90,10 +202,11 @@
 
         <a href="{% url 'appointments:doctor_review' appointment.id %}"
            class="bg-white border border-[#E5E7EB] px-8 py-4 rounded-xl
-                  font-semibold hover:bg-gray-50">
+                  font-semibold hover:bg-gray-50 transition">
           Cancel
         </a>
       </div>
+
     </form>
 
   </main>

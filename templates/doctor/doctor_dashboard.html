@@ -12,38 +12,49 @@
 
   <!-- SIDEBAR -->
   <aside class="w-64 bg-[#0E1626] text-white flex flex-col justify-between">
+
+    <!-- TOP SECTION -->
     <div>
       <div class="flex items-center gap-2 px-6 py-6 text-xl font-bold text-emerald-400">
         💚 MediTracker
       </div>
 
-     <nav class="mt-6 space-y-1">
+      <nav class="mt-6 space-y-1">
 
-  <a href="{% url 'core:doctor_dashboard' %}"
-     class="flex items-center gap-3 px-6 py-3 rounded-r-full bg-[#3F8F6B]">
-    🏠 Dashboard
-  </a>
+        <a href="{% url 'core:doctor_dashboard' %}"
+           class="flex items-center gap-3 px-6 py-3 rounded-r-full bg-[#3F8F6B]">
+          🏠 Dashboard
+        </a>
 
-  <a href="{% url 'appointments:doctor_list' %}"
-     class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
-    📅 Appointments
-  </a>
+        <a href="{% url 'appointments:doctor_list' %}"
+           class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+          📅 Appointments
+        </a>
 
-  <form method="post" action="{% url 'accounts:logout' %}">
-  {% csrf_token %}
-  <button type="submit"
-          class="w-full flex items-center gap-3 px-6 py-3 text-red-400 hover:bg-[#111827]">
-    🚪 Logout
-  </button>
-</form>
-
-</nav>
+      </nav>
     </div>
 
-    <div class="px-6 py-6 border-t border-[#111827]">
-      <p class="text-sm font-semibold">{{ request.user }}</p>
-      <p class="text-xs text-gray-400">Doctor</p>
+    <!-- BOTTOM SECTION -->
+    <div class="px-6 py-6 border-t border-[#111827] space-y-4">
+
+      <div>
+        <p class="text-sm font-semibold">{{ request.user }}</p>
+        <p class="text-xs text-gray-400">Doctor</p>
+      </div>
+
+      <!-- 🔴 Updated Logout Button -->
+      <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button type="submit"
+                class="w-full bg-red-500 hover:bg-red-600
+                       text-white py-2 rounded-lg
+                       text-sm font-semibold transition">
+          🚪 Logout
+        </button>
+      </form>
+
     </div>
+
   </aside>
 
   <!-- MAIN -->

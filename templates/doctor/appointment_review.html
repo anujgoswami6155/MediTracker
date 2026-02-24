@@ -9,6 +9,7 @@
 <body class="bg-[#F7FAFC] font-sans">
 <div class="flex min-h-screen">
 
+<!-- SIDEBAR -->
 <aside class="w-64 bg-[#0E1626] text-white flex flex-col justify-between">
   <div>
     <div class="flex items-center gap-2 px-6 py-6 text-xl font-bold text-emerald-400">
@@ -16,84 +17,225 @@
     </div>
 
     <nav class="mt-6 space-y-1">
-      <a class="flex items-center gap-3 px-6 py-3 rounded-r-full bg-[#3F8F6B]">
+      <a href="{% url 'core:doctor_dashboard' %}"
+         class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
         🏠 Dashboard
       </a>
-      <a href="appointment-list.html"
-         class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+
+      <a href="{% url 'appointments:doctor_list' %}"
+         class="flex items-center gap-3 px-6 py-3 rounded-r-full bg-[#3F8F6B]">
         📅 Appointments
       </a>
     </nav>
   </div>
 
-  <div class="px-6 py-6 border-t border-[#111827]">
-    <p class="text-sm font-semibold">Dr. John Smith</p>
-    <p class="text-xs text-gray-400">Cardiologist</p>
+  <!-- USER + LOGOUT -->
+  <div class="px-6 py-6 border-t border-[#111827] space-y-4">
+    <div>
+      <p class="text-sm font-semibold">
+        {{ request.user.get_full_name|default:request.user.username }}
+      </p>
+      <p class="text-xs text-gray-400">Doctor</p>
+    </div>
+
+    <form method="post" action="{% url 'accounts:logout' %}">
+      {% csrf_token %}
+      <button type="submit"
+              class="w-full bg-red-500 hover:bg-red-600
+                     text-white py-2 rounded-lg text-sm font-semibold transition">
+        🚪 Logout
+      </button>
+    </form>
   </div>
 </aside>
 
+<!-- MAIN -->
 <main class="flex-1 p-10">
 
 <h1 class="text-3xl font-bold mb-8">Review Appointment</h1>
 
-<!-- Appointment Summary -->
+<!-- APPOINTMENT SUMMARY -->
 <div class="bg-white rounded-[20px] shadow p-6 mb-8">
   <h2 class="font-semibold mb-4">Appointment Details</h2>
-  <div class="grid grid-cols-3 gap-4 text-sm">
-    <p><b>Patient:</b> Sarah Chen</p>
-    <p><b>Date:</b> 15 Jan 2026</p>
-    <p><b>Time:</b> 10:30 AM</p>
-    <p><b>Reason:</b> Regular follow-up</p>
+
+  <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
+
+    <p>
+      <b>Patient:</b>
+      {{ appointment.patient.get_full_name|default:appointment.patient.username }}
+    </p>
+
+    <p>
+      <b>Date:</b>
+      {{ appointment.appointment_date|date:"d M Y" }}
+    </p>
+
+    <p>
+      <b>Time:</b>
+      {{ appointment.appointment_time|time:"h:i A" }}
+    </p>
+
+    <p class="md:col-span-3">
+      <b>Reason:</b>
+      {{ appointment.reason|default:"No reason provided." }}
+    </p>
+
+    <p>
+      <b>Status:</b>
+      <span class="px-3 py-1 rounded-full text-xs
+        {% if appointment.status == 'approved' %}
+          bg-green-100 text-green-700
+        {% elif appointment.status == 'requested' %}
+          bg-yellow-100 text-yellow-700
+        {% else %}
+          bg-gray-100 text-gray-700
+        {% endif %}
+      ">
+        {{ appointment.status|title }}
+      </span>
+    </p>
+
+    <p>
+      <b>Requested On:</b>
+      {{ appointment.created_at|date:"d M Y" }}
+    </p>
+
   </div>
 </div>
 
 <!-- PATIENT DATA GRID -->
-<div class="grid grid-cols-3 gap-6">
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
   <!-- HISTORY -->
   <div class="bg-white rounded-[20px] shadow p-6">
     <h3 class="font-semibold mb-4">Medical History</h3>
     <ul class="text-sm space-y-2">
-      <li>📅 Appointment – 10 Jan 2026</li>
-      <li>💊 Metformin – ongoing</li>
-      <li>📊 Adherence – 92%</li>
+      {% for past in history %}
+        <li>
+          📅 {{ past.appointment_date|date:"d M Y" }}
+          – {{ past.status|title }}
+        </li>
+      {% empty %}
+        <li class="text-gray-500">No previous appointments</li>
+      {% endfor %}
     </ul>
   </div>
 
   <!-- REPORTS -->
   <div class="bg-white rounded-[20px] shadow p-6">
     <h3 class="font-semibold mb-4">Medical Reports</h3>
-    <ul class="text-sm space-y-2">
-      <li>📄 Blood_Work_Oct.pdf</li>
-      <li>🩻 X-Ray_Chest.jpg</li>
-    </ul>
+
+    {% if documents %}
+      <ul class="text-sm space-y-3">
+        {% for doc in documents %}
+          <li class="flex justify-between items-center border-b pb-2">
+            <div>
+              📄 <b>{{ doc.title|default:doc.get_document_type_display }}</b>
+              <div class="text-xs text-gray-500">
+                Uploaded on {{ doc.uploaded_at|date:"d M Y" }}
+              </div>
+            </div>
+
+            <a href="{{ doc.file.url }}"
+               target="_blank"
+               class="text-blue-600 hover:underline text-sm">
+              View
+            </a>
+          </li>
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p class="text-sm text-gray-500">No documents uploaded.</p>
+    {% endif %}
   </div>
 
-  <!-- INSTRUCTIONS -->
+  <!-- SAVED NOTES -->
   <div class="bg-white rounded-[20px] shadow p-6">
-    <h3 class="font-semibold mb-4">Previous Instructions</h3>
-    <ul class="text-sm space-y-2">
-      <li>💬 Take medicines regularly</li>
-      <li>💬 Avoid oily food</li>
-    </ul>
+    <h3 class="font-semibold mb-4">Doctor Notes</h3>
+
+    {% if appointment.doctor_notes %}
+        <div class="text-sm text-gray-700 whitespace-pre-line">
+            {{ appointment.doctor_notes }}
+        </div>
+
+        {% if appointment.follow_up_date %}
+            <p class="text-sm mt-3">
+              <b>Follow-up Date:</b>
+              {{ appointment.follow_up_date|date:"d M Y" }}
+            </p>
+        {% endif %}
+    {% else %}
+        <p class="text-sm text-gray-500">No notes added yet.</p>
+    {% endif %}
   </div>
 
 </div>
 
-<!-- ACTIONS -->
-
-<form method="post" class="mt-10 flex gap-4">
+<!-- ACTION FORM -->
+<form method="post" class="bg-white rounded-[20px] shadow p-8">
   {% csrf_token %}
 
-  <button type="submit" name="action" value="approve"
-          class="bg-[#3F8F6B] text-white px-10 py-4 rounded-xl font-semibold">
-    Approve Appointment
-  </button>
+  <h3 class="font-semibold mb-6">Add / Update Notes</h3>
 
-  <button type="submit" name="action" value="reschedule"
-          class="bg-[#F59E0B] text-white px-10 py-4 rounded-xl font-semibold">
-    Reschedule
-  </button>
+  <div class="mb-4">
+    <label class="block text-sm font-medium mb-2">Doctor Notes</label>
+    <textarea name="doctor_notes"
+              rows="4"
+              class="w-full border rounded-xl p-3 text-sm"
+              placeholder="Diagnosis, prescription, advice...">{{ appointment.doctor_notes }}</textarea>
+  </div>
+
+  <div class="mb-6">
+    <label class="block text-sm font-medium mb-2">Follow-up Date (Optional)</label>
+    <input type="date"
+           name="follow_up_date"
+           value="{{ appointment.follow_up_date|date:'Y-m-d' }}"
+           class="w-full border rounded-xl p-3 text-sm">
+  </div>
+
+  <div class="flex gap-4 mt-4">
+
+  {% if is_past_approved %}
+      <div class="text-gray-500 font-semibold">
+        This appointment is completed. No further actions allowed.
+      </div>
+
+  {% elif appointment.status == "approved" %}
+      <button type="submit"
+              name="action"
+              value="complete"
+              class="bg-blue-600 hover:opacity-90
+                     text-white px-10 py-4 rounded-xl font-semibold transition">
+        Mark as Completed
+      </button>
+
+      <button type="submit"
+              name="action"
+              value="reschedule"
+              class="bg-[#F59E0B] hover:opacity-90
+                     text-white px-10 py-4 rounded-xl font-semibold transition">
+        Reschedule
+      </button>
+
+  {% else %}
+      <button type="submit"
+              name="action"
+              value="approve"
+              class="bg-[#3F8F6B] hover:opacity-90
+                     text-white px-10 py-4 rounded-xl font-semibold transition">
+        Approve Appointment
+      </button>
+
+      <button type="submit"
+              name="action"
+              value="reschedule"
+              class="bg-[#F59E0B] hover:opacity-90
+                     text-white px-10 py-4 rounded-xl font-semibold transition">
+        Reschedule
+      </button>
+  {% endif %}
+
+  </div>
 </form>
 
 </main>
