@@ -45,7 +45,7 @@ path(
  path(
         "patient/<int:patient_id>/appointments/<int:appointment_id>/cancel/",
         views.family_cancel_appointment,
-        name="cancel_appointment"   # ⭐ THIS NAME MUST MATCH
+        name="cancel_appointment"   
     ),
 path(
     "patient/<int:patient_id>/overview/",
@@ -56,5 +56,6 @@ path(
     "patient/<int:patient_id>/appointments/create/",
     views.family_create_appointment,
     name="create_appointment",
-)
+),
+path("insights/", views.family_adherence_insights, name="adherence_insights"),
 ]

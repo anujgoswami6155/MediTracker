@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Adherence Insights | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-slate-100 font-sans">
+<div class="flex min-h-screen">
+
+  <!-- SIDEBAR -->
+  {% include "family/sidebar.html" %}
+
+  <!-- MAIN CONTENT -->
+  <main class="flex-1 p-10 space-y-10">
+
+    <!-- HEADER -->
+    <div>
+      <h1 class="text-3xl font-bold">📊 Adherence Insights</h1>
+      <p class="text-gray-500">
+        Medication adherence overview for your dependents (last 7 days)
+      </p>
+    </div>
+
+    <!-- SUMMARY CARDS -->
+    <div class="grid grid-cols-4 gap-6">
+      <div class="bg-white rounded-xl p-5 shadow">
+        <p class="text-sm text-gray-500">Overall Adherence</p>
+        <p class="text-3xl font-bold text-emerald-600">
+          {{ overall_adherence }}%
+        </p>
+        <p class="text-xs text-gray-400 mt-1">Last 7 days</p>
+      </div>
+
+      <div class="bg-white rounded-xl p-5 shadow">
+        <p class="text-sm text-gray-500">Doses Taken</p>
+        <p class="text-3xl font-bold text-blue-600">
+          {{ taken_count }}
+        </p>
+      </div>
+
+      <div class="bg-white rounded-xl p-5 shadow">
+        <p class="text-sm text-gray-500">Missed Doses</p>
+        <p class="text-3xl font-bold text-red-500">
+          {{ missed_count }}
+        </p>
+      </div>
+
+      <div class="bg-white rounded-xl p-5 shadow">
+        <p class="text-sm text-gray-500">Patients at Risk</p>
+        <p class="text-3xl font-bold text-orange-500">
+          {{ risk_patients_count }}
+        </p>
+        <p class="text-xs text-gray-400 mt-1">Adherence &lt; 50%</p>
+      </div>
+    </div>
+
+    <!-- PATIENT-WISE ADHERENCE -->
+    <div class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-lg font-semibold mb-5">
+        👨‍👩‍👧 Patient-wise Adherence
+      </h2>
+
+      <div class="space-y-5">
+        {% for row in patient_adherence %}
+          <div class="flex items-center justify-between gap-6">
+
+            <!-- Patient Info -->
+            <div class="w-52">
+              <p class="font-semibold">
+                {{ row.patient_name }}
+              </p>
+              <p class="text-xs text-gray-500">
+                Last 7 days
+              </p>
+
+              {% if row.percent < 50 %}
+                <span class="inline-block mt-1 text-xs text-red-600 font-semibold">
+                  ⚠ Needs attention
+                </span>
+              {% endif %}
+            </div>
+
+            <!-- Progress Bar -->
+            <div class="flex-1">
+              <div class="h-3 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  class="h-full
+                    {% if row.percent >= 80 %}
+                      bg-emerald-500
+                    {% elif row.percent >= 50 %}
+                      bg-yellow-400
+                    {% else %}
+                      bg-red-500
+                    {% endif %}
+                  "
+                  style="width: {{ row.percent|default:0|add:'%' }};">
+                </div>
+              </div>
+            </div>
+
+            <!-- Percentage -->
+            <div class="w-16 text-right font-semibold">
+              {{ row.percent }}%
+            </div>
+
+          </div>
+        {% empty %}
+          <p class="text-sm text-gray-400 text-center py-6">
+            No adherence data available yet.
+          </p>
+        {% endfor %}
+      </div>
+    </div>
+
+    <!-- RECENT MISSED DOSES -->
+    <div class="bg-white rounded-xl shadow p-6">
+      <h2 class="text-lg font-semibold mb-4">
+        ⚠ Recent Missed Doses
+      </h2>
+
+      <table class="w-full text-sm">
+        <thead class="text-gray-500 border-b">
+          <tr>
+            <th class="py-2 text-left">Patient</th>
+            <th class="py-2 text-left">Medicine</th>
+            <th class="py-2 text-left">Date</th>
+            <th class="py-2 text-left">Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for log in missed_logs %}
+            <tr class="border-b last:border-0">
+              <td class="py-3 font-medium">
+                {{ log.patient_name }}
+              </td>
+              <td class="py-3">
+                {{ log.medicine_name }}
+              </td>
+              <td class="py-3">
+                {{ log.date }}
+              </td>
+              <td class="py-3">
+                {{ log.time }}
+              </td>
+            </tr>
+          {% empty %}
+            <tr>
+              <td colspan="4" class="py-6 text-center text-gray-400">
+                🎉 No missed doses in the last 7 days
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

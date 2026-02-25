@@ -1,0 +1,47 @@
+<aside class="w-64 bg-[#0E1626] text-white flex flex-col justify-between">
+
+  <!-- TOP -->
+  <div>
+    <!-- LOGO -->
+    <div class="px-6 py-6 text-xl font-bold text-emerald-400">
+      💚 MediTracker
+    </div>
+
+    <!-- NAV -->
+    <nav class="space-y-1 text-sm">
+
+      <a href="{% url 'family:dashboard' %}"
+         class="flex items-center gap-3 px-6 py-3 hover:bg-[#111827]">
+        🏠 Dashboard
+      </a>
+
+      <a href="{% url 'family:adherence_insights' %}"
+         class="flex items-center gap-3 px-6 py-3 bg-[#3F8F6B] rounded-r-full">
+        📊 Insights
+      </a>
+
+      <a href="#" class="flex items-center gap-3 px-6 py-3 hover:bg-[#111827]">
+        👨‍👩‍👧 Dependents
+      </a>
+
+      <a href="#" class="flex items-center gap-3 px-6 py-3 hover:bg-[#111827]">
+        📅 Appointments
+      </a>
+
+      <a href="#" class="flex items-center gap-3 px-6 py-3 hover:bg-[#111827]">
+        💊 Medicines
+      </a>
+
+      <a href="#" class="flex items-center gap-3 px-6 py-3 hover:bg-[#111827]">
+        📄 Documents
+      </a>
+    </nav>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="px-6 py-5 border-t border-[#1F2937] text-xs text-gray-400">
+    {{ request.user.username }}<br>
+    Family Member
+  </div>
+
+</aside>

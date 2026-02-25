@@ -14,23 +14,19 @@
 
     <!-- TOP -->
     <div>
-      <!-- LOGO -->
       <div class="px-6 py-6 text-xl font-bold text-emerald-400">
         💚 MediTracker
       </div>
 
-      <!-- PATIENT SWITCHER (UI ONLY) -->
       <div class="px-6 mb-6">
         <p class="text-xs text-gray-400 mb-1">Managing</p>
-        <div class="bg-[#111827] px-3 py-2 rounded flex justify-between items-center cursor-pointer">
+        <div class="bg-[#111827] px-3 py-2 rounded flex justify-between items-center">
           <span class="text-sm">All Dependents</span>
           <span class="text-gray-400">⌄</span>
         </div>
       </div>
 
-      <!-- NAVIGATION -->
       <nav class="space-y-1 text-sm">
-
         <a class="flex items-center gap-3 px-6 py-3 bg-[#3F8F6B] rounded-r-full">
           🏠 Dashboard
         </a>
@@ -57,7 +53,8 @@
           🚨 Emergency Info
         </a>
 
-        <a href="#" class="flex items-center gap-3 px-6 py-3 hover:bg-[#111827]">
+        <a href="{% url 'family:adherence_insights' %}"
+           class="flex items-center gap-3 px-6 py-3 hover:bg-[#111827]">
           📊 Insights
         </a>
 
@@ -67,7 +64,7 @@
       </nav>
     </div>
 
-    <!-- SIDEBAR FOOTER -->
+    <!-- FOOTER -->
     <div class="px-6 py-5 border-t border-[#1F2937] space-y-4">
       <div class="text-xs text-gray-400 space-y-1">
         <p>✔ {{ approved_count }} Dependents</p>
@@ -103,7 +100,6 @@
         </p>
       </div>
 
-      <!-- Notification Bell (UI only) -->
       <button class="relative bg-white p-3 rounded-full shadow">
         🔔
         <span class="absolute top-0 right-0 h-2 w-2 bg-red-500 rounded-full"></span>
@@ -114,16 +110,12 @@
     <div class="grid grid-cols-4 gap-6">
       <div class="bg-white rounded-xl p-5 shadow">
         <p class="text-sm text-gray-500">Linked Patients</p>
-        <p class="text-3xl font-bold text-emerald-600">
-          {{ approved_count }}
-        </p>
+        <p class="text-3xl font-bold text-emerald-600">{{ approved_count }}</p>
       </div>
 
       <div class="bg-white rounded-xl p-5 shadow">
         <p class="text-sm text-gray-500">Pending Requests</p>
-        <p class="text-3xl font-bold text-yellow-500">
-          {{ pending_count }}
-        </p>
+        <p class="text-3xl font-bold text-yellow-500">{{ pending_count }}</p>
       </div>
 
       <div class="bg-white rounded-xl p-5 shadow">
@@ -151,13 +143,11 @@
           {{ appt.appointment_date }} {{ appt.appointment_time }}
         </p>
       {% empty %}
-        <p class="text-sm text-gray-400">
-          No upcoming appointments
-        </p>
+        <p class="text-sm text-gray-400">No upcoming appointments</p>
       {% endfor %}
     </div>
 
-    <!-- DEPENDENTS -->
+    <!-- MY DEPENDENTS -->
     <div>
       <div class="flex justify-between items-center mb-4">
         <h2 class="text-lg font-semibold">My Dependents</h2>
@@ -198,7 +188,62 @@
       </div>
     </div>
 
-    <!-- OPTIONAL UI PLACEHOLDERS -->
+    <!-- ✅ PENDING REQUESTS (NEW) -->
+    {% if pending_links %}
+    <div>
+      <h2 class="text-lg font-semibold mb-4">⏳ Pending Requests</h2>
+
+      <div class="space-y-3">
+        {% for link in pending_links %}
+          <div class="bg-white rounded-lg shadow p-4 flex justify-between items-center">
+            <div>
+              <p class="font-medium">
+                {{ link.patient.user.get_full_name|default:link.patient.user.username }}
+              </p>
+              <p class="text-sm text-gray-500">
+                {{ link.relation|default:"Family Member" }}
+              </p>
+            </div>
+
+            <span class="px-3 py-1 text-sm rounded-full bg-yellow-100 text-yellow-700">
+              Pending approval
+            </span>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+    {% endif %}
+
+    {% if rejected_links %}
+<div class="mt-8">
+  <h2 class="text-lg font-semibold mb-4">❌ Rejected Requests</h2>
+
+  <div class="space-y-3">
+    {% for link in rejected_links %}
+      <div class="bg-white rounded-lg shadow p-4 flex justify-between items-center border border-red-200">
+        <div>
+          <p class="font-medium text-gray-800">
+            {{ link.patient.user.get_full_name|default:link.patient.user.username }}
+          </p>
+          <p class="text-sm text-gray-500">
+            {{ link.relation|default:"Family Member" }}
+          </p>
+        </div>
+
+        <span class="px-3 py-1 text-sm rounded-full bg-red-100 text-red-700">
+          Rejected
+        </span>
+      </div>
+    {% endfor %}
+  </div>
+
+  <p class="mt-2 text-xs text-gray-400">
+    You may send a new request if details were incorrect.
+  </p>
+</div>
+{% endif %}
+
+    <!-- OPTIONAL UI -->
     <div class="grid grid-cols-3 gap-6">
       <div class="bg-white rounded-xl p-5 shadow">
         <h3 class="font-semibold mb-2">❤️ Health Alerts</h3>
