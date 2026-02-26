@@ -1,26 +1,87 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Profile | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-{% block content %}
-<h2>👤 My Profile</h2>
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
 
-<p><strong>Username:</strong> {{ profile.user.username }}</p>
-<p><strong>Email:</strong> {{ profile.user.email }}</p>
-<p><strong>Role:</strong> {{ profile.user.role }}</p>
+  {% include "patients/sidebar.html" %}
 
-<hr>
+  <main class="flex-1 p-10">
+    <div class="max-w-4xl">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">My Profile 👤</h1>
+      <p class="text-[#6B7280] mb-10">View and manage your personal information</p>
 
-<p><strong>Phone:</strong> {{ profile.phone|default:"Not set" }}</p>
-<p><strong>Date of Birth:</strong> {{ profile.date_of_birth|default:"Not set" }}</p>
-<p><strong>Gender:</strong> {{ profile.get_gender_display|default:"Not set" }}</p>
-<p><strong>Blood Group:</strong> {{ profile.blood_group|default:"Not set" }}</p>
+      <div class="bg-white rounded-[20px] shadow p-8 mb-6">
+        <h2 class="text-2xl font-bold mb-6">Account Information</h2>
+        <div class="space-y-4">
+          <div class="flex justify-between py-3 border-b">
+            <span class="text-gray-600">Username:</span>
+            <span class="font-semibold">{{ profile.user.username }}</span>
+          </div>
+          <div class="flex justify-between py-3 border-b">
+            <span class="text-gray-600">Email:</span>
+            <span class="font-semibold">{{ profile.user.email }}</span>
+          </div>
+          <div class="flex justify-between py-3 border-b">
+            <span class="text-gray-600">Role:</span>
+            <span class="px-3 py-1 bg-[#EAF7F1] text-[#3F8F6B] rounded-full text-sm font-semibold">Patient</span>
+          </div>
+        </div>
+      </div>
 
-<h3>Medical Information</h3>
-<p><strong>Allergies:</strong><br>{{ profile.allergies|default:"None" }}</p>
-<p><strong>Chronic Conditions:</strong><br>{{ profile.chronic_conditions|default:"None" }}</p>
+      <div class="bg-white rounded-[20px] shadow p-8 mb-6">
+        <h2 class="text-2xl font-bold mb-6">Personal Information</h2>
+        <div class="space-y-4">
+          <div class="flex justify-between py-3 border-b">
+            <span class="text-gray-600">Phone:</span>
+            <span class="font-semibold">{{ profile.phone|default:"Not set" }}</span>
+          </div>
+          <div class="flex justify-between py-3 border-b">
+            <span class="text-gray-600">Date of Birth:</span>
+            <span class="font-semibold">{{ profile.date_of_birth|date:"F d, Y"|default:"Not set" }}</span>
+          </div>
+          <div class="flex justify-between py-3 border-b">
+            <span class="text-gray-600">Gender:</span>
+            <span class="font-semibold">{{ profile.get_gender_display|default:"Not set" }}</span>
+          </div>
+          <div class="flex justify-between py-3 border-b">
+            <span class="text-gray-600">Blood Group:</span>
+            <span class="font-semibold">{{ profile.blood_group|default:"Not set" }}</span>
+          </div>
+        </div>
+      </div>
 
-<hr>
-<p><em>Created: {{ profile.created_at }}</em></p>
+      <div class="bg-white rounded-[20px] shadow p-8 mb-6">
+        <h2 class="text-2xl font-bold mb-6">Medical Information</h2>
+        <div class="space-y-4">
+          <div class="py-3 border-b">
+            <span class="text-gray-600 block mb-2">Allergies:</span>
+            <p class="text-gray-800">{{ profile.allergies|linebreaks|default:"None" }}</p>
+          </div>
+          <div class="py-3">
+            <span class="text-gray-600 block mb-2">Chronic Conditions:</span>
+            <p class="text-gray-800">{{ profile.chronic_conditions|linebreaks|default:"None" }}</p>
+          </div>
+        </div>
+      </div>
 
-<a href="{% url 'patients:profile_edit' %}">Edit Profile</a> | 
-<a href="{% url 'patients:dashboard' %}">Back to Dashboard</a>
-{% endblock %}
+      <div class="flex gap-4">
+        <a href="{% url 'patients:profile_edit' %}"
+           class="bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54]">
+          ✏️ Edit Profile
+        </a>
+        <a href="{% url 'patients:dashboard' %}"
+           class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300">
+          ⬅️ Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

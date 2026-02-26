@@ -1,12 +1,71 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Edit Profile | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-{% block content %}
-<h2>✏️ Edit Profile</h2>
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">Save Changes</button>
-    <a href="{% url 'patients:profile' %}">Cancel</a>
-</form>
-{% endblock %}
+  {% include "patients/sidebar.html" %}
+
+  <main class="flex-1 p-10">
+    <div class="max-w-3xl">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">Edit Profile ✏️</h1>
+      <p class="text-[#6B7280] mb-10">Update your personal and medical information</p>
+
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <form method="post" class="space-y-6">
+          {% csrf_token %}
+          
+          {% for field in form %}
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                {{ field.label }}
+              </label>
+              {% if field.field.widget.input_type == 'textarea' %}
+                <textarea name="{{ field.name }}" 
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3F8F6B] focus:border-transparent"
+                          rows="4">{{ field.value|default:'' }}</textarea>
+              {% else %}
+                <input type="{{ field.field.widget.input_type|default:'text' }}"
+                       name="{{ field.name }}"
+                       value="{{ field.value|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3F8F6B] focus:border-transparent">
+              {% endif %}
+              
+              {% if field.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ field.errors.0 }}</p>
+              {% endif %}
+              
+              {% if field.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ field.help_text }}</p>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <div class="flex gap-4 pt-4">
+            <button type="submit"
+                    class="bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54] transition">
+              💾 Save Changes
+            </button>
+            <a href="{% url 'patients:profile' %}"
+               class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+              ❌ Cancel
+            </a>
+          </div>
+        </form>
+
+        <div class="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+          <p class="text-sm text-blue-800">
+            <strong>Note:</strong> You cannot change your username or email here. Contact admin if needed.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

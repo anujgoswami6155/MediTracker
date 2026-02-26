@@ -1,71 +1,195 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Patient Dashboard | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-{% block content %}
-<h2>👤 Patient Dashboard</h2>
-<p>Welcome, <strong>{{ patient.user.username }}</strong>!</p>
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
 
-<hr>
+  <!-- SIDEBAR -->
+  <aside class="w-64 bg-[#0E1626] text-white flex flex-col justify-between">
+    <div>
+      <div class="flex items-center gap-2 px-6 py-6 text-xl font-bold text-emerald-400">
+        💚 MediTracker
+      </div>
 
-<h3>📊 Quick Stats</h3>
-<ul>
-    <li><strong>Active Schedules:</strong> {{ upcoming_schedules|length }}</li>
-    <li><strong>Recent Logs:</strong> {{ recent_logs|length }}</li>
-    <li><strong>Stored Documents:</strong> {{ documents_count }}</li>
-    <li><strong>Pending Appointments:</strong> {{ appointments_count }}</li>
-</ul>
+      <nav class="mt-6 space-y-1">
+        <a href="{% url 'patients:dashboard' %}"
+           class="flex items-center gap-3 px-6 py-3 rounded-r-full bg-[#3F8F6B]">
+          🏠 Dashboard
+        </a>
 
-<hr>
+        <a href="{% url 'patients:profile' %}"
+           class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+          👤 My Profile
+        </a>
 
-<h3>⏰ Upcoming Medicine Schedule</h3>
-{% if upcoming_schedules %}
-    <ul>
-    {% for schedule in upcoming_schedules %}
-        <li>
-            <strong>{{ schedule.prescription_item.medicine.name }}</strong> 
-            at <strong>{{ schedule.time }}</strong>
-            {% if schedule.repeat_daily %} (Daily){% endif %}
-        </li>
-    {% endfor %}
-    </ul>
-    <p><a href="{% url 'schedules:list' %}">📋 View All Schedules</a></p>
-{% else %}
-    <p>No schedules yet. <a href="{% url 'schedules:create' %}">➕ Create one</a></p>
-{% endif %}
+        <a href="{% url 'medicines:list' %}"
+           class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+          💊 Medicine Catalog
+        </a>
 
-<hr>
+        <a href="{% url 'medicines:prescriptions' %}"
+           class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+          📋 Prescriptions
+        </a>
 
-<h3>📝 Recent Intake Logs</h3>
-{% if recent_logs %}
-    <ul>
-    {% for log in recent_logs %}
-        <li>
-            {{ log.schedule.prescription_item.medicine.name }} - 
-            <strong>{{ log.get_status_display }}</strong> on {{ log.date|date:"M d, Y" }}
-        </li>
-    {% endfor %}
-    </ul>
-    <p><a href="{% url 'adherence:intake_list' %}">📋 View All Logs</a></p>
-{% else %}
-    <p>No intake logs yet. <a href="{% url 'adherence:intake_create' %}">➕ Add one</a></p>
-{% endif %}
+        <a href="{% url 'schedules:list' %}"
+           class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+          ⏰ Schedules
+        </a>
 
-<hr>
+        <a href="{% url 'adherence:intake_list' %}"
+           class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+          ✅ Intake Logs
+        </a>
 
-<h3>🔗 Quick Links</h3>
-<ul>
-    <li><a href="{% url 'patients:profile' %}">👤 My Profile</a></li>
-    <li><a href="{% url 'medicines:list' %}">💊 Medicine Catalog</a></li>
-    <li><a href="{% url 'medicines:prescriptions' %}">📋 My Prescriptions</a></li>
-    <li><a href="{% url 'schedules:list' %}">💊 My Medicine Schedules</a></li>
-    <li><a href="{% url 'adherence:intake_list' %}">✅ My Intake Logs</a></li>
-    <li><a href="{% url 'adherence:reminder_list' %}">🔔 My Reminders</a></li>
-    <li><a href="{% url 'documents:list' %}">📄 My Documents</a></li>
-    <li><a href="{% url 'appointments:patient_list' %}">📅 My Appointments</a></li>
-   <li> <a href="{% url 'patients:dependent_requests' %}">
-  👨‍👩‍👧 Manage Family Access
-</a></li>
-</ul>
+        <a href="{% url 'adherence:reminder_list' %}"
+           class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+          🔔 Reminders
+        </a>
 
-<hr>
-<a href="{% url 'accounts:logout' %}">🚪 Logout</a>
-{% endblock %}
+        <a href="{% url 'documents:list' %}"
+           class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+          📄 Documents
+        </a>
+
+        <a href="{% url 'appointments:patient_list' %}"
+           class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+          📅 Appointments
+        </a>
+
+        <a href="{% url 'patients:dependent_requests' %}"
+           class="flex items-center gap-3 px-6 py-3 text-gray-300 hover:bg-[#111827]">
+          👨‍👩‍👧 Family Access
+        </a>
+      </nav>
+    </div>
+
+    <div class="px-6 py-6 border-t border-[#111827] space-y-4">
+      <div>
+        <p class="text-sm font-semibold">{{ request.user.username }}</p>
+        <p class="text-xs text-gray-400">Patient</p>
+      </div>
+
+      <form method="post" action="{% url 'accounts:logout' %}">
+        {% csrf_token %}
+        <button type="submit"
+                class="w-full bg-red-500 hover:bg-red-600
+                       text-white py-2 rounded-lg
+                       text-sm font-semibold transition">
+          🚪 Logout
+        </button>
+      </form>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main class="flex-1 p-10">
+
+    <h1 class="text-4xl font-bold text-[#0F172A] mb-2">
+      Welcome back, {{ patient.user.username }} 👋
+    </h1>
+    <p class="text-[#6B7280] mb-10">
+      Your health management dashboard
+    </p>
+
+    <!-- KPI CARDS -->
+    <div class="grid grid-cols-4 gap-6 mb-10">
+      <div class="bg-white rounded-[20px] shadow p-6">
+        <p class="text-sm text-[#6B7280]">Active Schedules</p>
+        <p class="text-4xl font-bold text-[#3F8F6B] mt-2">{{ upcoming_schedules|length }}</p>
+      </div>
+
+      <div class="bg-white rounded-[20px] shadow p-6">
+        <p class="text-sm text-[#6B7280]">Recent Logs</p>
+        <p class="text-4xl font-bold text-[#3F8F6B] mt-2">{{ recent_logs|length }}</p>
+      </div>
+
+      <div class="bg-white rounded-[20px] shadow p-6">
+        <p class="text-sm text-[#6B7280]">Documents</p>
+        <p class="text-4xl font-bold text-[#3F8F6B] mt-2">{{ documents_count }}</p>
+      </div>
+
+      <div class="bg-white rounded-[20px] shadow p-6">
+        <p class="text-sm text-[#6B7280]">Appointments</p>
+        <p class="text-4xl font-bold text-[#3F8F6B] mt-2">{{ appointments_count }}</p>
+      </div>
+    </div>
+
+    <!-- UPCOMING SCHEDULES -->
+    <div class="bg-white rounded-[20px] shadow p-8 mb-6">
+      <h2 class="text-2xl font-bold mb-6">⏰ Upcoming Medicine Schedule</h2>
+
+      {% if upcoming_schedules %}
+        <div class="space-y-4">
+          {% for schedule in upcoming_schedules %}
+            <div class="flex items-center justify-between p-4 bg-[#EAF7F1] rounded-xl">
+              <div>
+                <p class="font-semibold text-lg">{{ schedule.prescription_item.medicine.name }}</p>
+                <p class="text-sm text-gray-600">{{ schedule.time }} {% if schedule.repeat_daily %}• Daily{% endif %}</p>
+              </div>
+              <span class="px-4 py-2 bg-[#3F8F6B] text-white rounded-lg text-sm font-semibold">
+                Take at {{ schedule.time }}
+              </span>
+            </div>
+          {% endfor %}
+        </div>
+        <a href="{% url 'schedules:list' %}"
+           class="inline-block mt-6 text-[#3F8F6B] font-semibold hover:underline">
+          View All Schedules →
+        </a>
+      {% else %}
+        <p class="text-gray-500">No schedules yet.</p>
+        <a href="{% url 'schedules:create' %}"
+           class="inline-block mt-4 bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54]">
+          ➕ Create Schedule
+        </a>
+      {% endif %}
+    </div>
+
+    <!-- RECENT LOGS -->
+    <div class="bg-white rounded-[20px] shadow p-8">
+      <h2 class="text-2xl font-bold mb-6">📝 Recent Intake Logs</h2>
+
+      {% if recent_logs %}
+        <div class="space-y-3">
+          {% for log in recent_logs %}
+            <div class="flex items-center justify-between p-3 border-l-4 
+                        {% if log.status == 'taken' %}border-green-500 bg-green-50
+                        {% elif log.status == 'missed' %}border-red-500 bg-red-50
+                        {% else %}border-gray-500 bg-gray-50{% endif %}
+                        rounded">
+              <div>
+                <p class="font-medium">{{ log.schedule.prescription_item.medicine.name }}</p>
+                <p class="text-sm text-gray-600">{{ log.date|date:"M d, Y" }}</p>
+              </div>
+              <span class="px-3 py-1 rounded-full text-sm font-semibold
+                           {% if log.status == 'taken' %}bg-green-200 text-green-800
+                           {% elif log.status == 'missed' %}bg-red-200 text-red-800
+                           {% else %}bg-gray-200 text-gray-800{% endif %}">
+                {{ log.get_status_display }}
+              </span>
+            </div>
+          {% endfor %}
+        </div>
+        <a href="{% url 'adherence:intake_list' %}"
+           class="inline-block mt-6 text-[#3F8F6B] font-semibold hover:underline">
+          View All Logs →
+        </a>
+      {% else %}
+        <p class="text-gray-500">No intake logs yet.</p>
+        <a href="{% url 'adherence:intake_create' %}"
+           class="inline-block mt-4 bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54]">
+          ➕ Add Log
+        </a>
+      {% endif %}
+    </div>
+
+  </main>
+</div>
+</body>
+</html>

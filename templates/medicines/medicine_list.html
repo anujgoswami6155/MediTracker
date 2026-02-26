@@ -1,43 +1,108 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Medicine Catalog | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-{% block content %}
-<h2>💊 Medicine Catalog</h2>
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
 
-<p>Browse and manage the medicine catalog</p>
+  {% include "patients/sidebar.html" %}
 
-<hr>
+  <main class="flex-1 p-10">
+    <div class="max-w-6xl">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">💊 Medicine Catalog</h1>
+      <p class="text-[#6B7280] mb-10">Browse and manage the medicine catalog</p>
 
-<!-- Search Bar -->
-<form method="get" action="{% url 'medicines:list' %}">
-    <input type="text" name="search" placeholder="Search medicines..." value="{{ search_query }}">
-    <button type="submit">🔍 Search</button>
-    <a href="{% url 'medicines:list' %}">Clear</a>
-</form>
+      <!-- Search Bar -->
+      <div class="bg-white rounded-[20px] shadow p-6 mb-6">
+        <form method="get" action="{% url 'medicines:list' %}" class="flex gap-4">
+          <input type="text" 
+                 name="search" 
+                 placeholder="Search medicines..." 
+                 value="{{ search_query }}"
+                 class="flex-1 px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3F8F6B] focus:border-transparent">
+          <button type="submit"
+                  class="bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54]">
+            🔍 Search
+          </button>
+          {% if search_query %}
+            <a href="{% url 'medicines:list' %}"
+               class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300">
+              Clear
+            </a>
+          {% endif %}
+        </form>
+      </div>
 
-<hr>
+      <!-- Add Button -->
+      <div class="mb-6">
+        <a href="{% url 'medicines:create' %}"
+           class="inline-block bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54]">
+          ➕ Add New Medicine
+        </a>
+      </div>
 
-<p><a href="{% url 'medicines:create' %}">➕ Add New Medicine</a></p>
+      <!-- Medicine List -->
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <h2 class="text-2xl font-bold mb-6">Medicines ({{ medicines|length }})</h2>
 
-<hr>
-
-{% if medicines %}
-    <h3>Medicines ({{ medicines|length }})</h3>
-    <ul>
-    {% for medicine in medicines %}
-        <li>
-            <strong><a href="{% url 'medicines:detail' medicine.pk %}">{{ medicine.name }}</a></strong>
-            {% if medicine.generic_name %}({{ medicine.generic_name }}){% endif %}
-            - {{ medicine.strength }}
-            {% if medicine.form %}- {{ medicine.form }}{% endif %}
-            {% if medicine.manufacturer %}<br><em>By {{ medicine.manufacturer }}</em>{% endif %}
-        </li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No medicines found. {% if search_query %}Try a different search.{% else %}<a href="{% url 'medicines:create' %}">Add one</a>{% endif %}</p>
-{% endif %}
-
-<hr>
-
-<p><a href="{% url 'patients:dashboard' %}">🏠 Back to Dashboard</a></p>
-{% endblock %}
+        {% if medicines %}
+          <div class="space-y-4">
+            {% for medicine in medicines %}
+              <div class="p-6 border border-gray-200 rounded-xl hover:shadow-md transition">
+                <div class="flex justify-between items-start">
+                  <div>
+                    <h3 class="text-xl font-bold text-[#0F172A]">
+                      <a href="{% url 'medicines:detail' medicine.pk %}" class="hover:text-[#3F8F6B]">
+                        {{ medicine.name }}
+                      </a>
+                    </h3>
+                    {% if medicine.generic_name %}
+                      <p class="text-sm text-gray-500 mt-1">({{ medicine.generic_name }})</p>
+                    {% endif %}
+                    <div class="flex gap-4 mt-2 text-sm">
+                      {% if medicine.strength %}
+                        <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full">{{ medicine.strength }}</span>
+                      {% endif %}
+                      {% if medicine.form %}
+                        <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full">{{ medicine.form }}</span>
+                      {% endif %}
+                    </div>
+                    {% if medicine.manufacturer %}
+                      <p class="text-sm text-gray-600 mt-2">By {{ medicine.manufacturer }}</p>
+                    {% endif %}
+                  </div>
+                  <a href="{% url 'medicines:detail' medicine.pk %}"
+                     class="text-[#3F8F6B] font-semibold hover:underline">
+                    View Details →
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-12">
+            <p class="text-gray-500 mb-4">
+              {% if search_query %}
+                No medicines found matching "{{ search_query }}". Try a different search.
+              {% else %}
+                No medicines in the catalog yet.
+              {% endif %}
+            </p>
+            {% if not search_query %}
+              <a href="{% url 'medicines:create' %}"
+                 class="inline-block bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54]">
+                ➕ Add First Medicine
+              </a>
+            {% endif %}
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
