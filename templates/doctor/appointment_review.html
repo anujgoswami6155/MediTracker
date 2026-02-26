@@ -29,7 +29,6 @@
     </nav>
   </div>
 
-  <!-- USER + LOGOUT -->
   <div class="px-6 py-6 border-t border-[#111827] space-y-4">
     <div>
       <p class="text-sm font-semibold">
@@ -53,31 +52,21 @@
 <main class="flex-1 p-10">
 
 <h1 class="text-3xl font-bold mb-8">Review Appointment</h1>
- {% if appointment.created_by_family %}
-  <div class="bg-blue-50 border border-blue-200 text-blue-800
-              px-6 py-4 rounded-xl mb-8">
-    👨‍👩‍👧 <b>Booked by Family Member:</b>
-    {{ appointment.created_by_family.get_full_name|default:appointment.created_by_family.username }}
-  </div>
-{% endif %}
+
 <!-- APPOINTMENT SUMMARY -->
 <div class="bg-white rounded-[20px] shadow p-6 mb-8">
   <h2 class="font-semibold mb-4">Appointment Details</h2>
 
   <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-
-    <p>
-      <b>Patient:</b>
+    <p><b>Patient:</b>
       {{ appointment.patient.get_full_name|default:appointment.patient.username }}
     </p>
 
-    <p>
-      <b>Date:</b>
+    <p><b>Date:</b>
       {{ appointment.appointment_date|date:"d M Y" }}
     </p>
 
-    <p>
-      <b>Time:</b>
+    <p><b>Time:</b>
       {{ appointment.appointment_time|time:"h:i A" }}
     </p>
 
@@ -86,30 +75,40 @@
       {{ appointment.reason|default:"No reason provided." }}
     </p>
 
+    <!-- ✅ ONLY STATUS LOGIC MODIFIED -->
     <p>
       <b>Status:</b>
-      <span class="px-3 py-1 rounded-full text-xs
-        {% if appointment.status == 'approved' %}
-          bg-green-100 text-green-700
-        {% elif appointment.status == 'requested' %}
-          bg-yellow-100 text-yellow-700
-        {% else %}
-          bg-gray-100 text-gray-700
-        {% endif %}
-      ">
-        {{ appointment.status|title }}
-      </span>
+
+      {% if appointment.status == "requested" and appointment.appointment_date < today %}
+          <span class="px-3 py-1 rounded-full text-xs bg-red-100 text-red-700">
+              Missed
+          </span>
+
+      {% elif appointment.status == 'approved' %}
+          <span class="px-3 py-1 rounded-full text-xs bg-green-100 text-green-700">
+              Approved
+          </span>
+
+      {% elif appointment.status == 'requested' %}
+          <span class="px-3 py-1 rounded-full text-xs bg-yellow-100 text-yellow-700">
+              Requested
+          </span>
+
+      {% else %}
+          <span class="px-3 py-1 rounded-full text-xs bg-gray-100 text-gray-700">
+              {{ appointment.status|title }}
+          </span>
+      {% endif %}
     </p>
 
     <p>
       <b>Requested On:</b>
       {{ appointment.created_at|date:"d M Y" }}
     </p>
-
   </div>
 </div>
 
-<!-- PATIENT DATA GRID -->
+<!-- HISTORY + REPORTS + SAVED NOTES -->
 <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
 
   <!-- HISTORY -->
@@ -166,10 +165,17 @@
 
         {% if appointment.follow_up_date %}
             <p class="text-sm mt-3">
-              <b>Follow-up Date:</b>
-              {{ appointment.follow_up_date|date:"d M Y" }}
+                <b>Follow-up Date:</b>
+                {{ appointment.follow_up_date|date:"d M Y" }}
             </p>
         {% endif %}
+
+    {% elif previous_followup and previous_followup.doctor_notes %}
+        <div class="text-sm text-blue-700 whitespace-pre-line">
+            <b>Follow-up From Previous Visit:</b><br>
+            {{ previous_followup.doctor_notes }}
+        </div>
+
     {% else %}
         <p class="text-sm text-gray-500">No notes added yet.</p>
     {% endif %}
@@ -187,7 +193,8 @@
     <label class="block text-sm font-medium mb-2">Doctor Notes</label>
     <textarea name="doctor_notes"
               rows="4"
-              class="w-full border rounded-xl p-3 text-sm"
+              class="w-full border rounded-xl p-3 text-sm {% if not can_modify %}bg-gray-100 cursor-not-allowed{% endif %}"
+              {% if not can_modify %}disabled{% endif %}
               placeholder="Diagnosis, prescription, advice...">{{ appointment.doctor_notes }}</textarea>
   </div>
 
@@ -196,50 +203,53 @@
     <input type="date"
            name="follow_up_date"
            value="{{ appointment.follow_up_date|date:'Y-m-d' }}"
-           class="w-full border rounded-xl p-3 text-sm">
+           class="w-full border rounded-xl p-3 text-sm {% if not can_modify %}bg-gray-100 cursor-not-allowed{% endif %}"
+           {% if not can_modify %}disabled{% endif %}>
   </div>
 
+  <!-- ✅ ONLY BUTTON LOGIC MODIFIED -->
   <div class="flex gap-4 mt-4">
 
-  {% if is_past_approved %}
-      <div class="text-gray-500 font-semibold">
-        This appointment is completed. No further actions allowed.
-      </div>
+    {% if appointment.status == "requested" and appointment.appointment_date < today %}
 
-  {% elif appointment.status == "approved" %}
-      <button type="submit"
-              name="action"
-              value="complete"
-              class="bg-blue-600 hover:opacity-90
-                     text-white px-10 py-4 rounded-xl font-semibold transition">
-        Mark as Completed
-      </button>
+        <!-- MISSED: Only Reschedule -->
+        <button type="submit"
+                name="action"
+                value="reschedule"
+                class="bg-[#F59E0B] text-white px-10 py-4 rounded-xl font-semibold">
+            Reschedule
+        </button>
 
-      <button type="submit"
-              name="action"
-              value="reschedule"
-              class="bg-[#F59E0B] hover:opacity-90
-                     text-white px-10 py-4 rounded-xl font-semibold transition">
-        Reschedule
-      </button>
+    {% else %}
 
-  {% else %}
-      <button type="submit"
-              name="action"
-              value="approve"
-              class="bg-[#3F8F6B] hover:opacity-90
-                     text-white px-10 py-4 rounded-xl font-semibold transition">
-        Approve Appointment
-      </button>
+        {% if appointment.status == "requested" %}
+            <button type="submit"
+                    name="action"
+                    value="approve"
+                    class="bg-[#3F8F6B] text-white px-10 py-4 rounded-xl font-semibold">
+                Approve Appointment
+            </button>
+        {% endif %}
 
-      <button type="submit"
-              name="action"
-              value="reschedule"
-              class="bg-[#F59E0B] hover:opacity-90
-                     text-white px-10 py-4 rounded-xl font-semibold transition">
-        Reschedule
-      </button>
-  {% endif %}
+        {% if appointment.status == "approved" and can_modify %}
+            <button type="submit"
+                    name="action"
+                    value="complete"
+                    class="bg-blue-600 text-white px-10 py-4 rounded-xl font-semibold">
+                Mark as Completed
+            </button>
+        {% endif %}
+
+        {% if appointment.appointment_date >= today %}
+            <button type="submit"
+                    name="action"
+                    value="reschedule"
+                    class="bg-[#F59E0B] text-white px-10 py-4 rounded-xl font-semibold">
+                Reschedule
+            </button>
+        {% endif %}
+
+    {% endif %}
 
   </div>
 </form>

@@ -29,7 +29,6 @@
     </nav>
   </div>
 
-  <!-- USER + LOGOUT -->
   <div class="px-6 py-6 border-t border-[#111827] space-y-4">
     <div>
       <p class="text-sm font-semibold">
@@ -49,12 +48,27 @@
 <!-- MAIN -->
 <main class="flex-1 p-10">
 
-<h1 class="text-3xl font-bold text-[#0F172A]">
-  Appointment Requests
-</h1>
-<p class="text-[#6B7280] mt-1 mb-8">
-  Review and manage patient appointment requests
-</p>
+<!-- HEADER + MISSED BOX -->
+<div class="flex items-center justify-between mb-8">
+
+  <div>
+    <h1 class="text-3xl font-bold text-[#0F172A]">
+      Appointment Requests
+    </h1>
+    <p class="text-[#6B7280] mt-1">
+      Review and manage patient appointment requests
+    </p>
+  </div>
+
+  <!-- 🔴 MISSED BOX -->
+  <div class="bg-red-50 border border-red-200 px-6 py-4 rounded-xl shadow text-center">
+      <p class="text-sm text-red-600 font-semibold">Missed</p>
+      <p class="text-2xl font-bold text-red-700">
+          {{ missed_count }}
+      </p>
+  </div>
+
+</div>
 
 <!-- APPOINTMENT CARDS -->
 <div class="bg-white rounded-[20px] shadow p-8 space-y-6">
@@ -64,8 +78,6 @@
   {% for appt in appointments %}
   <div class="flex items-center justify-between border-b pb-6 last:border-none">
 
-    <!-- LEFT SIDE (Patient Info) -->
-     
     <div>
       <p class="text-lg font-semibold text-[#0F172A]">
         {{ appt.patient.get_full_name|default:appt.patient.username }}
@@ -75,17 +87,17 @@
         {{ appt.appointment_date|date:"d M Y" }} •
         {{ appt.appointment_time|time:"h:i A" }}
       </p>
-      {% if appt.created_by_family %}
-      <p class="text-xs text-blue-600 mt-1">
-    👨‍👩‍👧 Booked by family:
-    {{ appt.created_by_family.get_full_name|default:appt.created_by_family.username }}
-     </p>
-      {% endif %}
-      <!-- STATUS BADGE -->
+
       <div class="mt-2">
-        {% if appt.status == "pending" %}
-            <span class="px-3 py-1 text-xs rounded-full bg-gray-200 text-gray-700">
-                Pending
+
+        {% if appt.status == "requested" and appt.appointment_date < today %}
+            <span class="px-3 py-1 text-xs rounded-full bg-red-100 text-red-700 font-semibold">
+                Missed
+            </span>
+
+        {% elif appt.status == "requested" %}
+            <span class="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700">
+                Requested
             </span>
 
         {% elif appt.status == "approved" %}
@@ -93,9 +105,9 @@
                 Approved
             </span>
 
-        {% elif appt.status == "today" %}
-            <span class="px-3 py-1 text-xs rounded-full bg-yellow-100 text-yellow-700">
-                Today
+        {% elif appt.status == "completed" %}
+            <span class="px-3 py-1 text-xs rounded-full bg-gray-200 text-gray-700">
+                Completed
             </span>
 
         {% else %}
@@ -103,10 +115,10 @@
                 {{ appt.status|title }}
             </span>
         {% endif %}
+
       </div>
     </div>
 
-    <!-- RIGHT SIDE (Review Button Only) -->
     <div>
       <a href="{% url 'appointments:doctor_review' appt.id %}"
          class="bg-[#5C8F70] hover:opacity-90 text-white px-6 py-2 rounded-xl font-semibold transition">

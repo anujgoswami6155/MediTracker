@@ -77,7 +77,7 @@ def cancel_appointment(request, pk):
 
 @role_required("doctor")
 def doctor_appointments(request):
-    today = timezone.now().date()
+    today = timezone.localdate()
     seven_days_ago = today - timedelta(days=7)
 
     appointments = Appointment.objects.filter(
@@ -88,10 +88,21 @@ def doctor_appointments(request):
         "-appointment_time"
     )
 
+    # ✅ Missed Count
+    missed_count = Appointment.objects.filter(
+        doctor=request.user,
+        status="requested",
+        appointment_date__lt=today
+    ).count()
+
     return render(
         request,
         "doctor/appointment_list.html",
-        {"appointments": appointments}
+        {
+            "appointments": appointments,
+            "today": today,
+            "missed_count": missed_count,  # 🔥 send to template
+        }
     )
 
 
@@ -124,6 +135,12 @@ def update_appointment(request, pk):
 
 
 from datetime import datetime
+from django.shortcuts import render, redirect, get_object_or_404
+from django.utils import timezone
+from django.contrib import messages
+from core.decorators import role_required
+from .models import Appointment
+
 
 @role_required("doctor")
 def review_appointment(request, pk):
@@ -133,26 +150,19 @@ def review_appointment(request, pk):
         doctor=request.user
     )
 
-    now = timezone.now()
+    today = timezone.localdate()
 
-    # Combine appointment date + time
-    appointment_datetime = datetime.combine(
-        appt.appointment_date,
-        appt.appointment_time
-    )
-    appointment_datetime = timezone.make_aware(appointment_datetime)
-
-    # Check if appointment is past but still approved
-    is_past_approved = (
-        appt.status == "approved" and
-        appointment_datetime < now
+    # Allow modify ONLY on exact appointment date AND approved
+    can_modify = (
+        appt.appointment_date == today and
+        appt.status == "approved"
     )
 
-    # Medical history
+    # ✅ FIXED HISTORY QUERY
     history = Appointment.objects.filter(
         patient=appt.patient,
-        status="approved",
-        appointment_date__lt=now.date()
+        status__in=["approved", "completed"],
+        appointment_date__lt=appt.appointment_date
     ).exclude(
         pk=appt.pk
     ).order_by(
@@ -170,31 +180,52 @@ def review_appointment(request, pk):
     # ================= POST LOGIC =================
     if request.method == "POST":
 
-        # ❌ Do not allow modification if completed
-        if appt.status == "completed":
-            return redirect("appointments:doctor_list")
-
         action = request.POST.get("action")
         notes = request.POST.get("doctor_notes")
         follow_up = request.POST.get("follow_up_date")
 
-        # Save doctor notes
-        if notes is not None:
+        # Restrict notes + complete
+        if action == "complete" or (notes and notes.strip() != ""):
+            if not can_modify:
+                messages.error(
+                    request,
+                    "Notes and completion are only allowed on the appointment date after approval."
+                )
+                return redirect("appointments:doctor_review", pk=appt.pk)
+
+        # Save notes
+        if notes is not None and can_modify:
             appt.doctor_notes = notes
 
-        # Save follow-up date safely
-        if follow_up:
-            appt.follow_up_date = datetime.strptime(
+        # Save follow-up date
+        if follow_up and can_modify:
+            follow_up_date_obj = datetime.strptime(
                 follow_up, "%Y-%m-%d"
             ).date()
-        else:
+
+            appt.follow_up_date = follow_up_date_obj
+
+            # ✅ AUTO COPY NOTES TO FOLLOW-UP APPOINTMENT
+            if notes and notes.strip() != "":
+                next_appt = Appointment.objects.filter(
+                    patient=appt.patient,
+                    appointment_date=follow_up_date_obj
+                ).exclude(
+                    pk=appt.pk
+                ).first()
+
+                if next_appt:
+                    next_appt.doctor_notes = notes
+                    next_appt.save(update_fields=["doctor_notes"])
+
+        elif can_modify:
             appt.follow_up_date = None
 
-        # Handle actions
+        # Actions
         if action == "approve":
             appt.status = "approved"
 
-        elif action == "complete":
+        elif action == "complete" and can_modify:
             appt.status = "completed"
 
         elif action == "reschedule":
@@ -205,6 +236,15 @@ def review_appointment(request, pk):
         messages.success(request, "Appointment updated successfully.")
         return redirect("appointments:doctor_list")
 
+    
+    previous_followup = Appointment.objects.filter(
+        patient=appt.patient,
+        follow_up_date=appt.appointment_date,
+        status="completed"
+    ).exclude(
+        pk=appt.pk
+    ).order_by("-appointment_date").first()
+
     return render(
         request,
         "doctor/appointment_review.html",
@@ -212,7 +252,9 @@ def review_appointment(request, pk):
             "appointment": appt,
             "history": history,
             "documents": documents,
-            "is_past_approved": is_past_approved,
+            "can_modify": can_modify,
+            "previous_followup": previous_followup,   
+            "today": today,
         }
     )
 
@@ -240,6 +282,11 @@ def reschedule_appointment(request, pk):
     )
 
     today = timezone.localdate()
+
+    # 🚫 BLOCK IF APPOINTMENT DATE IS ALREADY GONE
+    if appt.appointment_date < today:
+        messages.error(request, "Past appointments cannot be rescheduled.")
+        return redirect("appointments:doctor_list")
 
     if request.method == "POST":
         new_date = request.POST.get("appointment_date")

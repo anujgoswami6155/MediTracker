@@ -15,23 +15,25 @@ def patient_dashboard(request):
 @role_required("doctor")
 def doctor_dashboard(request):
     doctor = request.user
-
     today_date = timezone.localdate()
-
-    
-    start_of_week = today_date - timedelta(days=today_date.weekday())
-    end_of_week = start_of_week + timedelta(days=6)
 
     qs = Appointment.objects.filter(doctor=doctor)
 
-    pending = qs.filter(status="requested").count()
+    # Pending (still requested & future/today)
+    pending = qs.filter(
+        status="requested",
+        appointment_date__gte=today_date
+    ).count()
 
+    # Today appointments (not cancelled)
+    today = qs.filter(
+        appointment_date=today_date
+    ).exclude(status="cancelled").count()
 
-    today = qs.filter(appointment_date=today_date).exclude(status="cancelled").count()
-
-    approved_this_week = qs.filter(
-        status="approved",
-        appointment_date__range=[start_of_week, end_of_week]
+    # ✅ MISSED = requested but date already gone
+    missed = qs.filter(
+        status="requested",
+        appointment_date__lt=today_date
     ).count()
 
     approved = qs.filter(status="approved").count()
@@ -41,8 +43,8 @@ def doctor_dashboard(request):
     context = {
         "pending": pending,
         "today": today,
-        "approved": approved,                 # old (kept)
-        "approved_this_week": approved_this_week,
+        "approved": approved,
+        "missed": missed,
         "unread_alerts": unread_alerts,
     }
 

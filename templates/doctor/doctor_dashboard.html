@@ -13,7 +13,6 @@
   <!-- SIDEBAR -->
   <aside class="w-64 bg-[#0E1626] text-white flex flex-col justify-between">
 
-    <!-- TOP SECTION -->
     <div>
       <div class="flex items-center gap-2 px-6 py-6 text-xl font-bold text-emerald-400">
         💚 MediTracker
@@ -34,15 +33,12 @@
       </nav>
     </div>
 
-    <!-- BOTTOM SECTION -->
     <div class="px-6 py-6 border-t border-[#111827] space-y-4">
-
       <div>
         <p class="text-sm font-semibold">{{ request.user }}</p>
         <p class="text-xs text-gray-400">Doctor</p>
       </div>
 
-      <!-- 🔴 Updated Logout Button -->
       <form method="post" action="{% url 'accounts:logout' %}">
         {% csrf_token %}
         <button type="submit"
@@ -52,7 +48,6 @@
           🚪 Logout
         </button>
       </form>
-
     </div>
 
   </aside>
@@ -70,19 +65,22 @@
     <!-- KPI CARDS -->
     <div class="grid grid-cols-3 gap-6 mb-10">
 
+      <!-- Pending -->
       <div class="bg-white rounded-[20px] shadow p-6">
         <p class="text-sm text-[#6B7280]">Pending Requests</p>
         <p class="text-4xl font-bold text-[#3F8F6B] mt-2">{{ pending }}</p>
       </div>
 
+      <!-- Today -->
       <div class="bg-white rounded-[20px] shadow p-6">
         <p class="text-sm text-[#6B7280]">Today’s Appointments</p>
         <p class="text-4xl font-bold text-[#3F8F6B] mt-2">{{ today }}</p>
       </div>
 
-      <div class="bg-white rounded-[20px] shadow p-6">
-        <p class="text-sm text-[#6B7280]">Approved This Week</p>
-        <p class="text-4xl font-bold text-[#3F8F6B] mt-2">{{ approved_this_week }}</p>
+      <!-- 🔴 MISSED -->
+      <div class="bg-red-50 border border-red-200 rounded-[20px] shadow p-6">
+        <p class="text-sm text-red-600 font-semibold">Missed Appointments</p>
+        <p class="text-4xl font-bold text-red-700 mt-2">{{ missed }}</p>
       </div>
 
     </div>
