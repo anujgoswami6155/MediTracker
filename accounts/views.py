@@ -24,7 +24,7 @@ class UserLoginView(LoginView):
         user = self.request.user
 
         if user.role == "patient":
-            return reverse_lazy("core:patient_dashboard")
+            return reverse_lazy("patients:dashboard")
 
         elif user.role == "doctor":
             return reverse_lazy("core:doctor_dashboard")

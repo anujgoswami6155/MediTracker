@@ -1,18 +1,114 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>Schedules</h2>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Schedules | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-<a href="{% url 'schedules:create' %}">+ Create</a>
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
 
-<ul>
-  {% for s in schedules %}
-    <li>
-      {{ s }}
-      | <a href="{% url 'schedules:edit' s.id %}">Edit</a>
-      | <a href="{% url 'schedules:delete' s.id %}">Delete</a>
-    </li>
-  {% empty %}
-    <li>No schedules yet.</li>
-  {% endfor %}
-</ul>
-{% endblock %}
+  {% include "patients/sidebar.html" %}
+
+  <main class="flex-1 p-10">
+    <div class="max-w-6xl">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">⏰ My Medicine Schedules</h1>
+      <p class="text-[#6B7280] mb-10">Manage when you take your medicines</p>
+
+      <!-- Add Button -->
+      <div class="mb-6">
+        <a href="{% url 'schedules:create' %}"
+           class="inline-block bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54] transition">
+          ➕ Create New Schedule
+        </a>
+      </div>
+
+      <!-- Schedules List -->
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <h2 class="text-2xl font-bold mb-6">Active Schedules ({{ schedules|length }})</h2>
+
+        {% if schedules %}
+          <div class="space-y-4">
+            {% for schedule in schedules %}
+              <div class="p-6 border-l-4 border-[#3F8F6B] bg-[#EAF7F1] rounded-xl hover:shadow-md transition">
+                <div class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <h3 class="text-xl font-bold text-[#0F172A] mb-2">
+                      {{ schedule.prescription_item.medicine.name }}
+                    </h3>
+                    
+                    <div class="grid grid-cols-2 gap-4 mb-3">
+                      <div>
+                        <p class="text-sm text-gray-600">Dosage:</p>
+                        <p class="font-semibold">{{ schedule.prescription_item.dose }} {{ schedule.prescription_item.unit }}</p>
+                      </div>
+                      <div>
+                        <p class="text-sm text-gray-600">Frequency:</p>
+                        <p class="font-semibold">{{ schedule.prescription_item.frequency }}</p>
+                      </div>
+                      <div>
+                        <p class="text-sm text-gray-600">Time:</p>
+                        <p class="font-semibold text-[#3F8F6B]">{{ schedule.time }}</p>
+                      </div>
+                      <div>
+                        <p class="text-sm text-gray-600">Repeat:</p>
+                        <p class="font-semibold">{% if schedule.repeat_daily %}Daily{% else %}Custom{% endif %}</p>
+                      </div>
+                    </div>
+
+                    <div class="flex gap-2 text-sm">
+                      <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full">
+                        Start: {{ schedule.start_date }}
+                      </span>
+                      {% if schedule.end_date %}
+                        <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full">
+                          End: {{ schedule.end_date }}
+                        </span>
+                      {% endif %}
+                      {% if schedule.is_active %}
+                        <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full">Active</span>
+                      {% else %}
+                        <span class="px-3 py-1 bg-gray-100 text-gray-800 rounded-full">Inactive</span>
+                      {% endif %}
+                    </div>
+                  </div>
+
+                  <div class="flex gap-2 ml-6">
+                    <a href="{% url 'schedules:edit' schedule.pk %}"
+                       class="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                      ✏️ Edit
+                    </a>
+                    <a href="{% url 'schedules:delete' schedule.pk %}"
+                       class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
+                      🗑️ Delete
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-12">
+            <div class="text-6xl mb-4">⏰</div>
+            <p class="text-gray-500 text-lg mb-6">No schedules yet. Create one to start tracking your medicine times.</p>
+            <a href="{% url 'schedules:create' %}"
+               class="inline-block bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54]">
+              ➕ Create First Schedule
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Back Button -->
+      <div class="mt-6">
+        <a href="{% url 'patients:dashboard' %}"
+           class="inline-block text-[#3F8F6B] font-semibold hover:underline">
+          ⬅️ Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

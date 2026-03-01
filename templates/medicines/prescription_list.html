@@ -1,28 +1,123 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Prescriptions | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-{% block content %}
-<h2>📋 My Prescriptions</h2>
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
 
-<p><a href="{% url 'medicines:prescription_create' %}">➕ Create New Prescription</a></p>
+  {% include "patients/sidebar.html" %}
 
-<hr>
+  <main class="flex-1 p-10">
+    <div class="max-w-6xl">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">📋 My Prescriptions</h1>
+      <p class="text-[#6B7280] mb-10">View and manage your medical prescriptions</p>
 
-{% if prescriptions %}
-    <ul>
-    {% for prescription in prescriptions %}
-        <li>
-            <strong><a href="{% url 'medicines:prescription_detail' prescription.pk %}">Prescription #{{ prescription.id }}</a></strong>
-            <br>Doctor: {{ prescription.doctor.username|default:"Not specified" }}
-            <br>Date: {{ prescription.created_at|date:"F d, Y" }}
-            <br>Medicines: {{ prescription.items.count }}
-        </li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No prescriptions yet. <a href="{% url 'medicines:prescription_create' %}">Create one</a></p>
-{% endif %}
+      <!-- Create Button -->
+      <div class="mb-6">
+        <a href="{% url 'medicines:prescription_create' %}"
+           class="inline-block bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54] transition">
+          ➕ Create New Prescription
+        </a>
+      </div>
 
-<hr>
+      <!-- Prescriptions List -->
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <h2 class="text-2xl font-bold mb-6">All Prescriptions ({{ prescriptions|length }})</h2>
 
-<p><a href="{% url 'patients:dashboard' %}">🏠 Back to Dashboard</a></p>
-{% endblock %}
+        {% if prescriptions %}
+          <div class="space-y-4">
+            {% for prescription in prescriptions %}
+              <div class="p-6 border-2 border-[#3F8F6B] bg-[#EAF7F1] rounded-xl hover:shadow-lg transition">
+                <div class="flex justify-between items-start mb-4">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-2">
+                      <h3 class="text-xl font-bold text-[#0F172A]">
+                        Prescription #{{ prescription.id }}
+                      </h3>
+                      <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+                        {{ prescription.items.count }} medicine(s)
+                      </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <p class="text-sm text-gray-600">Doctor</p>
+                        <p class="font-semibold">
+                          {% if prescription.doctor %}
+                            Dr. {{ prescription.doctor.username }}
+                          {% else %}
+                            Not specified
+                          {% endif %}
+                        </p>
+                      </div>
+                      <div>
+                        <p class="text-sm text-gray-600">Date Created</p>
+                        <p class="font-semibold">{{ prescription.created_at|date:"M d, Y" }}</p>
+                      </div>
+                    </div>
+
+                    {% if prescription.notes %}
+                      <div class="mt-3 p-3 bg-white rounded-lg">
+                        <p class="text-sm text-gray-600">Notes:</p>
+                        <p class="text-gray-800">{{ prescription.notes }}</p>
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  <div class="ml-6">
+                    <a href="{% url 'medicines:prescription_detail' prescription.pk %}"
+                       class="inline-block px-6 py-3 bg-[#3F8F6B] text-white rounded-lg font-semibold hover:bg-[#2E6F54] transition">
+                      View Details →
+                    </a>
+                  </div>
+                </div>
+
+                <!-- Medicine Preview -->
+                {% if prescription.items.all %}
+                  <div class="border-t border-[#3F8F6B] pt-4 mt-4">
+                    <p class="text-sm font-semibold text-gray-700 mb-2">Medicines:</p>
+                    <div class="flex flex-wrap gap-2">
+                      {% for item in prescription.items.all|slice:":5" %}
+                        <span class="px-3 py-1 bg-white text-[#3F8F6B] rounded-full text-sm font-medium border border-[#3F8F6B]">
+                          {{ item.medicine.name }}
+                        </span>
+                      {% endfor %}
+                      {% if prescription.items.count > 5 %}
+                        <span class="px-3 py-1 bg-gray-200 text-gray-700 rounded-full text-sm">
+                          +{{ prescription.items.count|add:"-5" }} more
+                        </span>
+                      {% endif %}
+                    </div>
+                  </div>
+                {% endif %}
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-12">
+            <div class="text-6xl mb-4">📋</div>
+            <p class="text-gray-500 text-lg mb-6">No prescriptions yet. Create one to start managing your medicines!</p>
+            <a href="{% url 'medicines:prescription_create' %}"
+               class="inline-block bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54]">
+              ➕ Create First Prescription
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Back Button -->
+      <div class="mt-6">
+        <a href="{% url 'patients:dashboard' %}"
+           class="inline-block text-[#3F8F6B] font-semibold hover:underline">
+          ⬅️ Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

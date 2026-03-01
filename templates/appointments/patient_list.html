@@ -1,18 +1,151 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>My Appointments</h2>
-<a href="{% url 'appointments:request' %}">+ Request Appointment</a>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Appointments | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-<ul>
-  {% for a in appointments %}
-    <li>
-      {{ a.patient }} → {{ a.doctor }} | {{ a.appointment_date }} {{ a.appointment_time }} | {{ a.status }}
-      {% if a.status != "completed" %}
-        | <a href="{% url 'appointments:cancel' a.id %}">Cancel</a>
-      {% endif %}
-    </li>
-  {% empty %}
-    <li>No appointments yet.</li>
-  {% endfor %}
-</ul>
-{% endblock %}
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
+
+  {% include "patients/sidebar.html" %}
+
+  <main class="flex-1 p-10">
+    <div class="max-w-6xl">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">📅 My Appointments</h1>
+      <p class="text-[#6B7280] mb-10">View and manage your medical appointments</p>
+
+      <!-- Request Button -->
+      <div class="mb-6">
+        <a href="{% url 'appointments:request' %}"
+           class="inline-block bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54] transition">
+          ➕ Request New Appointment
+        </a>
+      </div>
+
+      <!-- Appointments List -->
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <h2 class="text-2xl font-bold mb-6">All Appointments ({{ appointments|length }})</h2>
+
+        {% if appointments %}
+          <div class="space-y-4">
+            {% for appt in appointments %}
+              <div class="p-6 border-2 
+                          {% if appt.status == 'approved' %}border-green-500 bg-green-50
+                          {% elif appt.status == 'requested' %}border-yellow-500 bg-yellow-50
+                          {% elif appt.status == 'rejected' %}border-red-500 bg-red-50
+                          {% elif appt.status == 'completed' %}border-blue-500 bg-blue-50
+                          {% else %}border-gray-300 bg-gray-50{% endif %}
+                          rounded-xl hover:shadow-md transition">
+                
+                <div class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-3">
+                      <h3 class="text-xl font-bold text-[#0F172A]">
+                        Appointment #{{ appt.id }}
+                      </h3>
+                      <span class="px-3 py-1 rounded-full text-sm font-semibold
+                                   {% if appt.status == 'approved' %}bg-green-200 text-green-800
+                                   {% elif appt.status == 'requested' %}bg-yellow-200 text-yellow-800
+                                   {% elif appt.status == 'rejected' %}bg-red-200 text-red-800
+                                   {% elif appt.status == 'completed' %}bg-blue-200 text-blue-800
+                                   {% else %}bg-gray-200 text-gray-800{% endif %}">
+                        {{ appt.get_status_display }}
+                      </span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4 mb-3">
+                      <div>
+                        <p class="text-sm text-gray-600">Doctor</p>
+                        <p class="font-semibold">
+                          {% if appt.doctor %}
+                            Dr. {{ appt.doctor.username }}
+                          {% else %}
+                            Not assigned
+                          {% endif %}
+                        </p>
+                      </div>
+                      <div>
+                        <p class="text-sm text-gray-600">Date & Time</p>
+                        <p class="font-semibold text-[#3F8F6B]">
+                          {{ appt.appointment_date|date:"M d, Y" }} at {{ appt.appointment_time }}
+                        </p>
+                      </div>
+                    </div>
+
+                    {% if appt.reason %}
+                      <div class="mb-3">
+                        <p class="text-sm text-gray-600">Reason</p>
+                        <p class="text-gray-800">{{ appt.reason }}</p>
+                      </div>
+                    {% endif %}
+
+                    <p class="text-xs text-gray-500">
+                      Requested: {{ appt.created_at|date:"M d, Y h:i A" }}
+                    </p>
+                  </div>
+
+                  {% if appt.status not in 'completed,cancelled' %}
+                    <div class="ml-6">
+                      <a href="{% url 'appointments:cancel' appt.pk %}"
+                         class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition">
+                        ❌ Cancel
+                      </a>
+                    </div>
+                  {% endif %}
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-12">
+            <div class="text-6xl mb-4">📅</div>
+            <p class="text-gray-500 text-lg mb-6">No appointments yet. Request one to meet with a doctor!</p>
+            <a href="{% url 'appointments:request' %}"
+               class="inline-block bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54]">
+              ➕ Request First Appointment
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Status Legend -->
+      <div class="mt-6 p-6 bg-gray-50 border border-gray-200 rounded-lg">
+        <h3 class="font-semibold text-gray-900 mb-3">📋 Status Guide</h3>
+        <div class="grid grid-cols-2 md:grid-cols-5 gap-3 text-sm">
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-yellow-500 rounded-full"></span>
+            <span>Requested - Pending approval</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+            <span>Approved - Confirmed</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-red-500 rounded-full"></span>
+            <span>Rejected - Denied</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-blue-500 rounded-full"></span>
+            <span>Completed - Done</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="w-3 h-3 bg-gray-500 rounded-full"></span>
+            <span>Cancelled - Called off</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Back Button -->
+      <div class="mt-6">
+        <a href="{% url 'patients:dashboard' %}"
+           class="inline-block text-[#3F8F6B] font-semibold hover:underline">
+          ⬅️ Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

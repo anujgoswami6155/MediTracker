@@ -1,36 +1,137 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Prescription #{{ prescription.id }} | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-{% block content %}
-<h2>📋 Prescription #{{ prescription.id }}</h2>
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
 
-<h3>Prescription Details</h3>
-<p><strong>Patient:</strong> {{ prescription.patient.username }}</p>
-<p><strong>Doctor:</strong> {{ prescription.doctor.username|default:"Not specified" }}</p>
-<p><strong>Date:</strong> {{ prescription.created_at|date:"F d, Y" }}</p>
-{% if prescription.notes %}
-    <p><strong>Notes:</strong><br>{{ prescription.notes|linebreaks }}</p>
-{% endif %}
+  {% include "patients/sidebar.html" %}
 
-<hr>
+  <main class="flex-1 p-10">
+    <div class="max-w-5xl">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">📋 Prescription #{{ prescription.id }}</h1>
+      <p class="text-[#6B7280] mb-10">Detailed view of your prescription</p>
 
-<h3>Medicines in This Prescription</h3>
-{% if items %}
-    <ul>
-    {% for item in items %}
-        <li>
-            <strong><a href="{% url 'medicines:detail' item.medicine.pk %}">{{ item.medicine.name }}</a></strong>
-            - {{ item.dose }} {{ item.unit }} - {{ item.frequency }}
-            {% if item.instructions %}<br><em>Instructions: {{ item.instructions }}</em>{% endif %}
-        </li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No medicines added yet.</p>
-{% endif %}
+      <!-- Prescription Details Card -->
+      <div class="bg-white rounded-[20px] shadow p-8 mb-6">
+        <h2 class="text-2xl font-bold mb-6">Prescription Information</h2>
+        
+        <div class="grid grid-cols-2 gap-6 mb-6">
+          <div class="p-4 bg-gray-50 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">Patient</p>
+            <p class="text-lg font-semibold">{{ prescription.patient.username }}</p>
+          </div>
+          
+          <div class="p-4 bg-gray-50 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">Doctor</p>
+            <p class="text-lg font-semibold">
+              {% if prescription.doctor %}
+                Dr. {{ prescription.doctor.username }}
+              {% else %}
+                Not specified
+              {% endif %}
+            </p>
+          </div>
+          
+          <div class="p-4 bg-gray-50 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">Date Created</p>
+            <p class="text-lg font-semibold">{{ prescription.created_at|date:"F d, Y" }}</p>
+          </div>
+          
+          <div class="p-4 bg-gray-50 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">Total Medicines</p>
+            <p class="text-lg font-semibold text-[#3F8F6B]">{{ items|length }}</p>
+          </div>
+        </div>
 
-<p><a href="{% url 'medicines:add_medicine_to_prescription' prescription.pk %}">➕ Add Medicine</a></p>
+        {% if prescription.notes %}
+          <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-sm font-semibold text-blue-900 mb-2">📝 Notes:</p>
+            <p class="text-blue-800">{{ prescription.notes|linebreaks }}</p>
+          </div>
+        {% endif %}
+      </div>
 
-<hr>
+      <!-- Medicines in Prescription -->
+      <div class="bg-white rounded-[20px] shadow p-8 mb-6">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-2xl font-bold">Medicines in This Prescription</h2>
+          <a href="{% url 'medicines:add_medicine_to_prescription' prescription.pk %}"
+             class="bg-[#3F8F6B] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#2E6F54] transition">
+            ➕ Add Medicine
+          </a>
+        </div>
 
-<p><a href="{% url 'medicines:prescriptions' %}">⬅️ Back to Prescriptions</a></p>
-{% endblock %}
+        {% if items %}
+          <div class="space-y-4">
+            {% for item in items %}
+              <div class="p-6 border-2 border-[#3F8F6B] bg-[#EAF7F1] rounded-xl">
+                <div class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <h3 class="text-xl font-bold text-[#0F172A] mb-3">
+                      <a href="{% url 'medicines:detail' item.medicine.pk %}" 
+                         class="hover:text-[#3F8F6B] transition">
+                        {{ item.medicine.name }}
+                      </a>
+                    </h3>
+                    
+                    <div class="grid grid-cols-3 gap-4">
+                      <div>
+                        <p class="text-sm text-gray-600">Dosage</p>
+                        <p class="font-semibold text-lg">{{ item.dose }} {{ item.unit }}</p>
+                      </div>
+                      
+                      <div>
+                        <p class="text-sm text-gray-600">Frequency</p>
+                        <p class="font-semibold text-lg">{{ item.frequency }}</p>
+                      </div>
+                      
+                      <div>
+                        <p class="text-sm text-gray-600">Status</p>
+                        <span class="inline-block px-3 py-1 rounded-full text-sm font-semibold
+                                     {% if item.is_active %}bg-green-200 text-green-800
+                                     {% else %}bg-gray-200 text-gray-800{% endif %}">
+                          {% if item.is_active %}Active{% else %}Inactive{% endif %}
+                        </span>
+                      </div>
+                    </div>
+
+                    {% if item.instructions %}
+                      <div class="mt-4 p-3 bg-white rounded-lg">
+                        <p class="text-sm font-semibold text-gray-700 mb-1">💡 Instructions:</p>
+                        <p class="text-gray-800">{{ item.instructions }}</p>
+                      </div>
+                    {% endif %}
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-12">
+            <div class="text-6xl mb-4">💊</div>
+            <p class="text-gray-500 text-lg mb-6">No medicines added yet.</p>
+            <a href="{% url 'medicines:add_medicine_to_prescription' prescription.pk %}"
+               class="inline-block bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54]">
+              ➕ Add First Medicine
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex gap-4">
+        <a href="{% url 'medicines:prescriptions' %}"
+           class="inline-block text-[#3F8F6B] font-semibold hover:underline">
+          ⬅️ Back to Prescriptions
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

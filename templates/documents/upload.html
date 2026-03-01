@@ -1,14 +1,103 @@
-{% extends "base.html" %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Upload Document | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-<h2>Upload Document</h2>
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
 
-<form method="POST" enctype="multipart/form-data">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Upload</button>
-</form>
+  {% include "patients/sidebar.html" %}
 
-<a href="{% url 'documents:list' %}">Back</a>
+  <main class="flex-1 p-10">
+    <div class="max-w-3xl">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">⬆️ Upload Medical Document</h1>
+      <p class="text-[#6B7280] mb-10">Add a new document to your medical records</p>
 
-{% endblock %}
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <form method="post" enctype="multipart/form-data" class="space-y-6">
+          {% csrf_token %}
+          
+          {% for field in form %}
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                {{ field.label }}
+                {% if field.field.required %}
+                  <span class="text-red-500">*</span>
+                {% endif %}
+              </label>
+              
+              {% if field.name == 'file' %}
+                <div class="border-2 border-dashed border-gray-300 rounded-lg p-8 text-center hover:border-[#3F8F6B] transition">
+                  <div class="text-4xl mb-4">📁</div>
+                  <input type="file" 
+                         name="{{ field.name }}"
+                         accept=".pdf,.jpg,.jpeg,.png"
+                         required
+                         class="block w-full text-sm text-gray-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-lg file:border-0
+                                file:text-sm file:font-semibold
+                                file:bg-[#3F8F6B] file:text-white
+                                hover:file:bg-[#2E6F54]
+                                cursor-pointer">
+                  <p class="mt-2 text-sm text-gray-500">
+                    Supported: PDF, JPG, PNG (Max 10MB)
+                  </p>
+                </div>
+              {% elif field.field.widget.input_type == 'select' %}
+                <select name="{{ field.name }}"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3F8F6B] focus:border-transparent">
+                  {% for value, label in field.field.choices %}
+                    <option value="{{ value }}">{{ label }}</option>
+                  {% endfor %}
+                </select>
+              {% elif field.field.widget.input_type == 'textarea' %}
+                <textarea name="{{ field.name }}"
+                          rows="4"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3F8F6B] focus:border-transparent"
+                          placeholder="Add any notes about this document...">{{ field.value|default:'' }}</textarea>
+              {% else %}
+                <input type="{{ field.field.widget.input_type|default:'text' }}"
+                       name="{{ field.name }}"
+                       value="{{ field.value|default:'' }}"
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3F8F6B] focus:border-transparent"
+                       placeholder="{{ field.label }}">
+              {% endif %}
+              
+              {% if field.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ field.errors.0 }}</p>
+              {% endif %}
+              
+              {% if field.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ field.help_text }}</p>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <div class="flex gap-4 pt-4">
+            <button type="submit"
+                    class="bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54] transition">
+              ⬆️ Upload Document
+            </button>
+            <a href="{% url 'documents:list' %}"
+               class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+              ❌ Cancel
+            </a>
+          </div>
+        </form>
+
+        <div class="mt-8 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+          <p class="text-sm text-yellow-800">
+            <strong>⚠️ Important:</strong> Only upload documents that belong to you. 
+            Keep sensitive information secure and don't share your login credentials.
+          </p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

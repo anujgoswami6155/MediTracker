@@ -12,7 +12,20 @@ PATIENT_SCHEDULE_LOOKUP = "schedule__prescription_item__prescription__patient"
 @role_required("patient")
 def intake_list(request):
     logs = IntakeLog.objects.filter(patient=request.user).select_related("schedule").order_by("-id")
-    return render(request, "adherence/intake_list.html", {"logs": logs})
+    
+    # Calculate stats
+    total_logs = logs.count()
+    taken_count = logs.filter(status='taken').count()
+    missed_count = logs.filter(status='missed').count()
+    skipped_count = logs.filter(status='skipped').count()
+    
+    return render(request, "adherence/intake_list.html", {
+        "logs": logs,
+        "total_logs": total_logs,
+        "taken_count": taken_count,
+        "missed_count": missed_count,
+        "skipped_count": skipped_count,
+    })
 
 
 @role_required("patient")

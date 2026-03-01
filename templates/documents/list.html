@@ -1,26 +1,115 @@
-{% extends "base.html" %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Documents | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-<h2>My Documents</h2>
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
 
-<a href="{% url 'documents:upload' %}">Upload New Document</a>
+  {% include "patients/sidebar.html" %}
 
-<hr>
+  <main class="flex-1 p-10">
+    <div class="max-w-6xl">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">📄 My Medical Documents</h1>
+      <p class="text-[#6B7280] mb-10">Store and manage your medical documents securely</p>
 
-<ul>
-  {% for doc in documents %}
-    <li>
-      <strong>{{ doc.title }}</strong>
-      ({{ doc.document_type }})
-      <br>
-      <a href="{% url 'documents:detail' doc.id %}">View</a> |
-      {% if user.role == "patient" %}
-        <a href="{% url 'documents:delete' doc.id %}">Delete</a>
-      {% endif %}
-    </li>
-  {% empty %}
-    <li>No documents found.</li>
-  {% endfor %}
-</ul>
+      <!-- Upload Button -->
+      <div class="mb-6">
+        <a href="{% url 'documents:upload' %}"
+           class="inline-block bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54] transition">
+          ⬆️ Upload Document
+        </a>
+      </div>
 
-{% endblock %}
+      <!-- Documents Grid -->
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <h2 class="text-2xl font-bold mb-6">All Documents ({{ documents|length }})</h2>
+
+        {% if documents %}
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {% for doc in documents %}
+              <div class="border-2 border-gray-200 rounded-xl hover:border-[#3F8F6B] hover:shadow-lg transition p-6">
+                <div class="text-center mb-4">
+                  {% if doc.document_type == 'prescription' %}
+                    <div class="text-5xl mb-2">💊</div>
+                  {% elif doc.document_type == 'lab_report' %}
+                    <div class="text-5xl mb-2">🧪</div>
+                  {% elif doc.document_type == 'scan' %}
+                    <div class="text-5xl mb-2">🔬</div>
+                  {% elif doc.document_type == 'discharge' %}
+                    <div class="text-5xl mb-2">📋</div>
+                  {% else %}
+                    <div class="text-5xl mb-2">📄</div>
+                  {% endif %}
+                  
+                  <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-xs font-semibold">
+                    {{ doc.get_document_type_display }}
+                  </span>
+                </div>
+
+                <h3 class="font-bold text-lg text-center mb-2 line-clamp-2">
+                  {% if doc.title %}
+                    {{ doc.title }}
+                  {% else %}
+                    {{ doc.get_document_type_display }}
+                  {% endif %}
+                </h3>
+
+                <p class="text-sm text-gray-600 text-center mb-4">
+                  Uploaded: {{ doc.uploaded_at|date:"M d, Y" }}
+                </p>
+
+                {% if doc.notes %}
+                  <div class="bg-gray-50 p-3 rounded-lg mb-4 text-sm text-gray-700 line-clamp-2">
+                    {{ doc.notes }}
+                  </div>
+                {% endif %}
+
+                <div class="flex gap-2">
+                  <a href="{% url 'documents:detail' doc.pk %}"
+                     class="flex-1 text-center px-4 py-2 bg-[#3F8F6B] text-white rounded-lg hover:bg-[#2E6F54] text-sm font-semibold transition">
+                    👁️ View
+                  </a>
+                  <a href="{{ doc.file.url }}" download
+                     class="flex-1 text-center px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 text-sm font-semibold transition">
+                    ⬇️ Download
+                  </a>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-12">
+            <div class="text-6xl mb-4">📄</div>
+            <p class="text-gray-500 text-lg mb-6">No documents yet. Upload your first medical document!</p>
+            <a href="{% url 'documents:upload' %}"
+               class="inline-block bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54]">
+              ⬆️ Upload First Document
+            </a>
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- Info Box -->
+      <div class="mt-6 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+        <h3 class="font-semibold text-blue-900 mb-2">🔒 Your documents are secure</h3>
+        <p class="text-sm text-blue-800">
+          All documents are stored securely and only accessible by you. Supported formats: PDF, JPG, PNG.
+        </p>
+      </div>
+
+      <!-- Back Button -->
+      <div class="mt-6">
+        <a href="{% url 'patients:dashboard' %}"
+           class="inline-block text-[#3F8F6B] font-semibold hover:underline">
+          ⬅️ Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
