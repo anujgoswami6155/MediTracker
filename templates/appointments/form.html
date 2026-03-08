@@ -1,9 +1,93 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>{{ title }}</h2>
-<form method="post">
-  {% csrf_token %}
-  {{ form.as_p }}
-  <button type="submit">Save</button>
-</form>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ title }} | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
+
+  {% include "patients/sidebar.html" %}
+
+  <main class="flex-1 p-10">
+    <div class="max-w-3xl">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">{{ title }}</h1>
+      <p class="text-[#6B7280] mb-10">Schedule an appointment with your doctor</p>
+
+      <!-- Display Messages -->
+      {% if messages %}
+        <div class="mb-6 space-y-3">
+          {% for message in messages %}
+            <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800{% elif message.tags == 'success' %}bg-green-50 border border-green-200 text-green-800{% else %}bg-blue-50 border border-blue-200 text-blue-800{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <form method="post" class="space-y-6">
+          {% csrf_token %}
+          
+          {% for field in form %}
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                {{ field.label }}
+                {% if field.field.required %}
+                  <span class="text-red-500">*</span>
+                {% endif %}
+              </label>
+              
+              {{ field }}
+              
+              {% if field.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ field.errors.0 }}</p>
+              {% endif %}
+              
+              {% if field.help_text %}
+                <p class="mt-1 text-sm text-gray-500">{{ field.help_text }}</p>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <!-- Display form-level errors -->
+          {% if form.non_field_errors %}
+            <div class="p-4 bg-red-50 border border-red-200 rounded-lg">
+              <p class="text-sm text-red-800 font-semibold">Errors:</p>
+              {% for error in form.non_field_errors %}
+                <p class="text-sm text-red-800">• {{ error }}</p>
+              {% endfor %}
+            </div>
+          {% endif %}
+
+          <div class="flex gap-4 pt-4">
+            <button type="submit"
+                    class="bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54] transition">
+              📅 Submit Request
+            </button>
+            <a href="{% url 'appointments:patient_list' %}"
+               class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+              ❌ Cancel
+            </a>
+          </div>
+        </form>
+
+        <!-- Info Box -->
+        <div class="mt-8 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+          <h3 class="font-semibold text-blue-900 mb-3">📋 Appointment Guidelines</h3>
+          <ul class="text-sm text-blue-800 space-y-2">
+            <li>• <strong>Office Hours:</strong> 7:00 AM - 8:00 PM</li>
+            <li>• <strong>Lunch Break:</strong> 1:00 PM - 2:00 PM (unavailable)</li>
+            <li>• <strong>Appointment Slots:</strong> 15-minute intervals</li>
+            <li>• Your request will be reviewed by the doctor</li>
+            <li>• You'll be notified once approved</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
