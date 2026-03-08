@@ -15,6 +15,7 @@ def upload_document(request):
         form = MedicalDocumentForm(request.POST, request.FILES)
         if form.is_valid():
             doc = form.save(commit=False)
+            doc.patient = request.user  # ✅ Auto-set patient to current user
             doc.uploaded_by = request.user
             doc.save()
             return redirect("documents:list")
@@ -37,10 +38,12 @@ def document_list(request):
         documents = MedicalDocument.objects.filter(
             patient=user,
             is_active=True
-        )
+        ).order_by('-uploaded_at')  # ✅ Added ordering
 
     elif user.role in ["doctor", "family"]:
-        documents = MedicalDocument.objects.filter(is_active=True)
+        documents = MedicalDocument.objects.filter(
+            is_active=True
+        ).order_by('-uploaded_at')  # ✅ Added ordering
 
     else:
         documents = MedicalDocument.objects.none()
