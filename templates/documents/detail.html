@@ -1,15 +1,111 @@
-{% extends "base.html" %}
-{% block content %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ document.title|default:"Document" }} | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-<h2>Document Details</h2>
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
 
-<p><strong>Title:</strong> {{ document.title }}</p>
-<p><strong>Type:</strong> {{ document.document_type }}</p>
-<p><strong>Notes:</strong> {{ document.notes }}</p>
+  {% include "patients/sidebar.html" %}
 
-<a href="{{ document.file.url }}" target="_blank">Download File</a>
-<br><br>
+  <main class="flex-1 p-10">
+    <div class="max-w-4xl">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">📄 Document Details</h1>
+      <p class="text-[#6B7280] mb-10">View and manage your medical document</p>
 
-<a href="{% url 'documents:list' %}">Back to list</a>
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <!-- Document Header -->
+        <div class="flex items-start justify-between mb-8">
+          <div class="flex-1">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="text-5xl">
+                {% if document.document_type == 'prescription' %}💊
+                {% elif document.document_type == 'lab_report' %}🧪
+                {% elif document.document_type == 'scan' %}🔬
+                {% elif document.document_type == 'discharge' %}📋
+                {% else %}📄{% endif %}
+              </div>
+              <div>
+                <h2 class="text-2xl font-bold text-[#0F172A]">
+                  {{ document.title|default:"Untitled Document" }}
+                </h2>
+                <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+                  {{ document.get_document_type_display }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
 
-{% endblock %}
+        <!-- Document Info Grid -->
+        <div class="grid grid-cols-2 gap-6 mb-8">
+          <div class="p-4 bg-gray-50 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">Uploaded Date</p>
+            <p class="text-lg font-semibold">{{ document.uploaded_at|date:"F d, Y" }}</p>
+            <p class="text-sm text-gray-500">{{ document.uploaded_at|date:"h:i A" }}</p>
+          </div>
+
+          <div class="p-4 bg-gray-50 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">Uploaded By</p>
+            <p class="text-lg font-semibold">{{ document.uploaded_by.username }}</p>
+          </div>
+
+          <div class="p-4 bg-gray-50 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">Patient</p>
+            <p class="text-lg font-semibold">{{ document.patient.username }}</p>
+          </div>
+
+          <div class="p-4 bg-gray-50 rounded-lg">
+            <p class="text-sm text-gray-600 mb-1">File Type</p>
+            <p class="text-lg font-semibold uppercase">{{ document.file.name|slice:"-3:" }}</p>
+          </div>
+        </div>
+
+        <!-- Notes -->
+        {% if document.notes %}
+        <div class="mb-8">
+          <h3 class="text-lg font-bold text-[#0F172A] mb-3">📝 Notes</h3>
+          <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+            <p class="text-gray-800">{{ document.notes|linebreaks }}</p>
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Preview Section (for images) -->
+        {% if document.file.name|slice:"-3:"|lower == "jpg" or document.file.name|slice:"-3:"|lower == "png" or document.file.name|slice:"-4:"|lower == "jpeg" %}
+        <div class="mb-8">
+          <h3 class="text-lg font-bold text-[#0F172A] mb-3">🖼️ Preview</h3>
+          <div class="border-2 border-gray-200 rounded-lg p-4 bg-gray-50">
+            <img src="{{ document.file.url }}" alt="{{ document.title }}" class="max-w-full h-auto rounded-lg shadow-lg">
+          </div>
+        </div>
+        {% endif %}
+
+        <!-- Action Buttons -->
+        <div class="flex gap-4 pt-6 border-t">
+          <a href="{{ document.file.url }}" download
+             class="px-6 py-3 bg-[#3F8F6B] text-white rounded-lg font-semibold hover:bg-[#2E6F54] transition">
+            ⬇️ Download
+          </a>
+          <a href="{{ document.file.url }}" target="_blank"
+             class="px-6 py-3 bg-blue-500 text-white rounded-lg font-semibold hover:bg-blue-600 transition">
+            👁️ View Full Document
+          </a>
+          <a href="{% url 'documents:delete' document.pk %}"
+             class="px-6 py-3 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition">
+            🗑️ Delete
+          </a>
+          <a href="{% url 'documents:list' %}"
+             class="px-6 py-3 bg-gray-200 text-gray-800 rounded-lg font-semibold hover:bg-gray-300 transition">
+            ⬅️ Back to Documents
+          </a>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

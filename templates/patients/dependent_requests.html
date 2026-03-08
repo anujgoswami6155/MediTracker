@@ -1,44 +1,125 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-  <title>Dependent Requests</title>
+  <meta charset="UTF-8">
+  <title>Family Access Requests | MediTracker</title>
   <script src="https://cdn.tailwindcss.com"></script>
 </head>
 
-<body class="bg-gray-100 p-10">
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
 
-<h1 class="text-3xl font-bold mb-6">Dependent Requests</h1>
+  {% include "patients/sidebar.html" %}
 
-{% if requests %}
-  <div class="space-y-4">
-    {% for link in requests %}
-      <div class="bg-white p-6 rounded shadow flex justify-between items-center">
-        <div>
-          <p class="font-semibold">
-            {{ link.family_member.username }}
-          </p>
-          <p class="text-sm text-gray-500">
-            Relation: {{ link.relation|default:"Family" }}
-          </p>
+  <main class="flex-1 p-10">
+    <div class="max-w-5xl">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">👨‍👩‍👧‍👦 Family Access Requests</h1>
+      <p class="text-[#6B7280] mb-10">Manage who can view and help manage your medical information</p>
+
+      <!-- Display Messages -->
+      {% if messages %}
+        <div class="mb-6 space-y-3">
+          {% for message in messages %}
+            <div class="p-4 rounded-lg {% if message.tags == 'error' %}bg-red-50 border border-red-200 text-red-800{% elif message.tags == 'success' %}bg-green-50 border border-green-200 text-green-800{% else %}bg-blue-50 border border-blue-200 text-blue-800{% endif %}">
+              {{ message }}
+            </div>
+          {% endfor %}
         </div>
+      {% endif %}
 
-        <div class="flex gap-4">
-          <a href="{% url 'patients:handle_dependent_request' link.id 'approve' %}"
-             class="bg-green-600 text-white px-4 py-2 rounded">
-            Approve
-          </a>
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <h2 class="text-2xl font-bold mb-6">Pending Requests ({{ requests|length }})</h2>
 
-          <a href="{% url 'patients:handle_dependent_request' link.id 'reject' %}"
-             class="bg-red-500 text-white px-4 py-2 rounded">
-            Reject
-          </a>
-        </div>
+        {% if requests %}
+          <div class="space-y-4">
+            {% for request in requests %}
+              <div class="p-6 border-2 border-yellow-200 bg-yellow-50 rounded-xl hover:shadow-md transition">
+                <div class="flex justify-between items-start">
+                  <div class="flex-1">
+                    <div class="flex items-center gap-3 mb-3">
+                      <div class="w-12 h-12 bg-[#3F8F6B] text-white rounded-full flex items-center justify-center text-xl font-bold">
+                        {{ request.family_member.username|slice:":1"|upper }}
+                      </div>
+                      <div>
+                        <h3 class="text-xl font-bold text-[#0F172A]">
+                          {{ request.family_member.username }}
+                        </h3>
+                        <p class="text-sm text-gray-600">
+                          Requested: {{ request.created_at|date:"M d, Y h:i A" }}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div class="bg-white rounded-lg p-4 mb-3">
+                      <p class="text-sm font-semibold text-gray-700 mb-2">Requesting Permission To:</p>
+                      <div class="grid grid-cols-2 gap-2 text-sm text-gray-600">
+                        <div class="flex items-center gap-2">
+                          <span class="text-green-500">✓</span> View your profile
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="text-green-500">✓</span> View medicines
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="text-green-500">✓</span> View schedules
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="text-green-500">✓</span> View intake logs
+                        </div>
+                        <div class="flex items-center gap-2">
+                          <span class="text-green-500">✓</span> View documents
+                        </div>
+                        {% if request.can_manage_appointments %}
+                        <div class="flex items-center gap-2">
+                          <span class="text-blue-500">✓</span> Manage appointments
+                        </div>
+                        {% endif %}
+                      </div>
+                    </div>
+
+                    <div class="flex gap-3">
+                      <a href="{% url 'patients:handle_dependent_request' request.pk 'approve' %}"
+                         class="px-6 py-2 bg-green-500 text-white rounded-lg font-semibold hover:bg-green-600 transition">
+                        ✓ Approve Access
+                      </a>
+                      <a href="{% url 'patients:handle_dependent_request' request.pk 'reject' %}"
+                         class="px-6 py-2 bg-red-500 text-white rounded-lg font-semibold hover:bg-red-600 transition">
+                        ✗ Reject
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="text-center py-12">
+            <div class="text-6xl mb-4">👨‍👩‍👧‍👦</div>
+            <p class="text-gray-500 text-lg mb-6">No pending family access requests</p>
+            <p class="text-gray-400 text-sm">
+              Family members can request access to help you manage your medical information
+            </p>
+          </div>
+        {% endif %}
       </div>
-    {% endfor %}
-  </div>
-{% else %}
-  <p class="text-gray-500">No pending requests.</p>
-{% endif %}
 
+      <!-- Info Box -->
+      <div class="mt-6 p-6 bg-blue-50 border border-blue-200 rounded-lg">
+        <h3 class="font-semibold text-blue-900 mb-2">🔒 Privacy & Security</h3>
+        <p class="text-sm text-blue-800">
+          You control who can access your medical information. You can approve or reject any request, 
+          and you can revoke access at any time from your settings.
+        </p>
+      </div>
+
+      <!-- Back Button -->
+      <div class="mt-6">
+        <a href="{% url 'patients:dashboard' %}"
+           class="inline-block text-[#3F8F6B] font-semibold hover:underline">
+          ⬅️ Back to Dashboard
+        </a>
+      </div>
+    </div>
+  </main>
+</div>
 </body>
 </html>

@@ -1,16 +1,93 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>{% if form.instance.pk %}Edit{% else %}Add{% endif %} Medicine | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-{% block content %}
-<h2>{{ title }}</h2>
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
 
-<form method="post">
-    {% csrf_token %}
-    {{ form.as_p }}
-    <button type="submit">💾 Save</button>
-    <a href="{% if medicine %}{% url 'medicines:detail' medicine.pk %}{% else %}{% url 'medicines:list' %}{% endif %}">❌ Cancel</a>
-</form>
+  {% include "patients/sidebar.html" %}
 
-<hr>
+  <main class="flex-1 p-10">
+    <div class="max-w-3xl">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">
+        {% if form.instance.pk %}✏️ Edit Medicine{% else %}➕ Add New Medicine{% endif %}
+      </h1>
+      <p class="text-[#6B7280] mb-10">
+        {% if form.instance.pk %}Update medicine information{% else %}Add a new medicine to your catalog{% endif %}
+      </p>
 
-<p><em>Add medicine to the global catalog. All users can see this.</em></p>
-{% endblock %}
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <form method="post" class="space-y-6">
+          {% csrf_token %}
+          
+          {% for field in form %}
+            <div>
+              <label class="block text-sm font-semibold text-gray-700 mb-2">
+                {{ field.label }}
+                {% if field.field.required %}
+                  <span class="text-red-500">*</span>
+                {% endif %}
+              </label>
+              
+              {% if field.name == 'description' %}
+                <textarea name="{{ field.name }}"
+                          rows="4"
+                          class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3F8F6B] focus:border-transparent"
+                          placeholder="Describe this medicine...">{{ field.value|default:'' }}</textarea>
+              {% elif field.field.widget.input_type == 'checkbox' %}
+                <div class="flex items-center">
+                  <input type="checkbox" 
+                         name="{{ field.name }}"
+                         {% if field.value %}checked{% endif %}
+                         class="w-5 h-5 text-[#3F8F6B] border-gray-300 rounded focus:ring-[#3F8F6B]">
+                  <span class="ml-3 text-gray-700">{{ field.help_text|default:"Yes" }}</span>
+                </div>
+              {% elif field.field.widget.input_type == 'select' %}
+                <select name="{{ field.name }}"
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3F8F6B] focus:border-transparent">
+                  {% for value, label in field.field.choices %}
+                    <option value="{{ value }}" {% if field.value == value %}selected{% endif %}>
+                      {{ label }}
+                    </option>
+                  {% endfor %}
+                </select>
+              {% else %}
+                <input type="{{ field.field.widget.input_type|default:'text' }}"
+                       name="{{ field.name }}"
+                       value="{{ field.value|default:'' }}"
+                       {% if field.field.required %}required{% endif %}
+                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3F8F6B] focus:border-transparent"
+                       placeholder="{{ field.label }}">
+              {% endif %}
+              
+              {% if field.errors %}
+                <p class="mt-1 text-sm text-red-600">{{ field.errors.0 }}</p>
+              {% endif %}
+              
+              {% if field.help_text and field.field.widget.input_type != 'checkbox' %}
+                <p class="mt-1 text-sm text-gray-500">{{ field.help_text }}</p>
+              {% endif %}
+            </div>
+          {% endfor %}
+
+          <div class="flex gap-4 pt-4">
+            <button type="submit"
+                    class="bg-[#3F8F6B] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#2E6F54] transition">
+              💾 Save Medicine
+            </button>
+            <a href="{% url 'medicines:list' %}"
+               class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+              ❌ Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

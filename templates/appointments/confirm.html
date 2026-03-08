@@ -1,10 +1,74 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>{{ title }}</h2>
-<p>Are you sure?</p>
-<p><b>{{ obj }}</b></p>
-<form method="post">
-  {% csrf_token %}
-  <button type="submit">Yes</button>
-</form>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Cancel Appointment | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
+
+  {% include "patients/sidebar.html" %}
+
+  <main class="flex-1 p-10">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">⚠️ {{ title }}</h1>
+      <p class="text-[#6B7280] mb-10">Confirm cancellation of your appointment</p>
+
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <div class="bg-yellow-50 border-2 border-yellow-200 rounded-lg p-6 mb-6">
+          <h3 class="text-xl font-bold text-yellow-900 mb-3">
+            Are you sure you want to cancel this appointment?
+          </h3>
+          
+          {% if obj %}
+          <div class="bg-white rounded-lg p-4 mb-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-sm text-gray-600">Doctor</p>
+                <p class="font-semibold text-gray-900">
+                  {% if obj.doctor %}Dr. {{ obj.doctor.username }}{% else %}Not assigned{% endif %}
+                </p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Date & Time</p>
+                <p class="font-semibold text-[#3F8F6B]">
+                  {{ obj.appointment_date|date:"M d, Y" }} at {{ obj.appointment_time }}
+                </p>
+              </div>
+              {% if obj.reason %}
+              <div class="col-span-2">
+                <p class="text-sm text-gray-600">Reason</p>
+                <p class="text-gray-800">{{ obj.reason }}</p>
+              </div>
+              {% endif %}
+            </div>
+          </div>
+          {% endif %}
+
+          <p class="text-yellow-800">
+            ⚠️ Once cancelled, you'll need to request a new appointment if you want to see the doctor.
+          </p>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="flex gap-4">
+            <button type="submit"
+                    class="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition">
+              ❌ Yes, Cancel Appointment
+            </button>
+            <a href="{% url 'appointments:patient_list' %}"
+               class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+              ⬅️ Keep Appointment
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

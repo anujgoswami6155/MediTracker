@@ -1,9 +1,81 @@
-{% extends "base.html" %}
-{% block content %}
-<h2>Delete</h2>
-<p>Delete: <b>{{ obj }}</b> ?</p>
-<form method="post">
-  {% csrf_token %}
-  <button type="submit">Yes, delete</button>
-</form>
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delete Appointment | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
+
+  {% include "patients/sidebar.html" %}
+
+  <main class="flex-1 p-10">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">⚠️ Delete Appointment</h1>
+      <p class="text-[#6B7280] mb-10">Permanently remove this appointment</p>
+
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <div class="bg-red-50 border-2 border-red-200 rounded-lg p-6 mb-6">
+          <h3 class="text-xl font-bold text-red-900 mb-3">
+            Are you sure you want to delete this appointment?
+          </h3>
+          
+          {% if object %}
+          <div class="bg-white rounded-lg p-4 mb-4">
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-sm text-gray-600">Patient</p>
+                <p class="font-semibold text-gray-900">{{ object.patient.username }}</p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Doctor</p>
+                <p class="font-semibold text-gray-900">
+                  {% if object.doctor %}Dr. {{ object.doctor.username }}{% else %}Not assigned{% endif %}
+                </p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Date & Time</p>
+                <p class="font-semibold text-[#3F8F6B]">
+                  {{ object.appointment_date|date:"M d, Y" }} at {{ object.appointment_time }}
+                </p>
+              </div>
+              <div>
+                <p class="text-sm text-gray-600">Status</p>
+                <span class="px-3 py-1 rounded-full text-sm font-semibold
+                             {% if object.status == 'approved' %}bg-green-200 text-green-800
+                             {% elif object.status == 'requested' %}bg-yellow-200 text-yellow-800
+                             {% else %}bg-gray-200 text-gray-800{% endif %}">
+                  {{ object.get_status_display }}
+                </span>
+              </div>
+            </div>
+          </div>
+          {% endif %}
+
+          <p class="text-red-800">
+            ⚠️ This action cannot be undone. All appointment data will be permanently deleted.
+          </p>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="flex gap-4">
+            <button type="submit"
+                    class="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition">
+              🗑️ Yes, Delete Permanently
+            </button>
+            <a href="javascript:history.back()"
+               class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+              ❌ Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

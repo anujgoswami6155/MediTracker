@@ -1,15 +1,54 @@
-{% extends "base.html" %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delete Medicine | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
 
-{% block content %}
-<h2>🗑️ Delete Medicine</h2>
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
 
-<p>Are you sure you want to delete <strong>{{ medicine.name }}</strong>?</p>
+  {% include "patients/sidebar.html" %}
 
-<p><em>Note: This will not delete the medicine entirely, just mark it as inactive. Existing prescriptions will still reference it.</em></p>
+  <main class="flex-1 p-10">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">⚠️ Delete Medicine</h1>
+      <p class="text-[#6B7280] mb-10">Confirm deletion of this medicine</p>
 
-<form method="post">
-    {% csrf_token %}
-    <button type="submit">✅ Yes, Delete</button>
-    <a href="{% url 'medicines:detail' medicine.pk %}">❌ Cancel</a>
-</form>
-{% endblock %}
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <div class="bg-red-50 border-2 border-red-200 rounded-lg p-6 mb-6">
+          <h3 class="text-xl font-bold text-red-900 mb-3">
+            Are you sure you want to delete "{{ object.name }}"?
+          </h3>
+          <p class="text-red-800 mb-4">
+            ⚠️ This action cannot be undone. Deleting this medicine will:
+          </p>
+          <ul class="text-red-700 space-y-2 ml-6">
+            <li>• Remove it from all prescriptions</li>
+            <li>• Delete associated schedules</li>
+            <li>• Remove all intake logs</li>
+            <li>• Permanently erase all related data</li>
+          </ul>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="flex gap-4">
+            <button type="submit"
+                    class="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition">
+              🗑️ Yes, Delete Permanently
+            </button>
+            <a href="{% url 'medicines:detail' object.pk %}"
+               class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+              ❌ Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>
