@@ -29,10 +29,28 @@
                 {% endif %}
               </label>
               
-              {% if field.field.widget.input_type == 'select' %}
+              {% if field.name == 'prescription_item' or field.name == 'schedule' %}
                 <select name="{{ field.name }}"
+                        {% if field.field.required %}required{% endif %}
                         class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3F8F6B] focus:border-transparent">
-                  {{ field }}
+                  <option value="">Select a medicine...</option>
+                  {% for choice_value, choice_label in field.field.choices %}
+                    {% if choice_value %}
+                      <option value="{{ choice_value }}" {% if field.value == choice_value %}selected{% endif %}>
+                        {{ choice_label }}
+                      </option>
+                    {% endif %}
+                  {% endfor %}
+                </select>
+              {% elif field.name == 'status' %}
+                <select name="{{ field.name }}"
+                        {% if field.field.required %}required{% endif %}
+                        class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3F8F6B] focus:border-transparent">
+                  {% for choice_value, choice_label in field.field.choices %}
+                    <option value="{{ choice_value }}" {% if field.value == choice_value %}selected{% endif %}>
+                      {{ choice_label }}
+                    </option>
+                  {% endfor %}
                 </select>
               {% elif field.field.widget.input_type == 'checkbox' %}
                 <div class="flex items-center">
@@ -40,14 +58,10 @@
                          name="{{ field.name }}"
                          {% if field.value %}checked{% endif %}
                          class="w-5 h-5 text-[#3F8F6B] border-gray-300 rounded focus:ring-[#3F8F6B]">
-                  <span class="ml-3 text-gray-700">{{ field.help_text }}</span>
+                  <span class="ml-3 text-gray-700">{{ field.help_text|default:"Yes" }}</span>
                 </div>
               {% else %}
-                <input type="{{ field.field.widget.input_type|default:'text' }}"
-                       name="{{ field.name }}"
-                       value="{{ field.value|default:'' }}"
-                       {% if field.field.required %}required{% endif %}
-                       class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#3F8F6B] focus:border-transparent">
+                {{ field }}
               {% endif %}
               
               {% if field.errors %}
@@ -74,7 +88,8 @@
 
         <div class="mt-8 p-4 bg-blue-50 border border-blue-200 rounded-lg">
           <p class="text-sm text-blue-800">
-            <strong>💡 Tip:</strong> Make sure the medicine is already in your prescriptions before creating a schedule.
+            <strong>💡 Tip:</strong> Make sure you have created a prescription with medicines before creating a schedule.
+            <a href="{% url 'medicines:prescriptions' %}" class="underline font-semibold">Go to Prescriptions →</a>
           </p>
         </div>
       </div>
