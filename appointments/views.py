@@ -29,12 +29,62 @@ def patient_appointments(request):
 def request_appointment(request):
     if request.method == "POST":
         form = AppointmentRequestForm(request.POST)
+
         if form.is_valid():
             appt = form.save(commit=False)
             appt.patient = request.user
+
+            selected_time = appt.appointment_time
+
+            # ✅ Doctor working hours check (7 AM – 8 PM)
+            if selected_time < time(7, 0) or selected_time > time(20, 0):
+                messages.error(
+                    request,
+                    "Appointments can only be booked between 7:00 AM and 8:00 PM."
+                )
+                return render(
+                    request,
+                    "appointments/form.html",
+                    {"form": form, "title": "Request Appointment"}
+                )
+
+            # ✅ Lunch break check (1 PM – 2 PM)
+            if time(13, 0) <= selected_time < time(14, 0):
+                messages.error(
+                    request,
+                    "Doctor is unavailable between 1:00 PM and 2:00 PM (Lunch Break)."
+                )
+                return render(
+                    request,
+                    "appointments/form.html",
+                    {"form": form, "title": "Request Appointment"}
+                )
+
+            # ✅ Check if slot already booked
+            slot_exists = Appointment.objects.filter(
+                doctor=appt.doctor,
+                appointment_date=appt.appointment_date,
+                appointment_time=appt.appointment_time
+            ).exists()
+
+            if slot_exists:
+                messages.error(
+                    request,
+                    "This slot is already booked by another patient."
+                )
+                return render(
+                    request,
+                    "appointments/form.html",
+                    {"form": form, "title": "Request Appointment"}
+                )
+
+            # Save appointment
             appt.status = "requested"
             appt.save()
+
+            messages.success(request, "Appointment requested successfully.")
             return redirect("appointments:patient_list")
+
     else:
         form = AppointmentRequestForm()
 
@@ -283,8 +333,8 @@ def reschedule_appointment(request, pk):
 
     today = timezone.localdate()
 
-    # 🚫 BLOCK IF APPOINTMENT DATE IS ALREADY GONE
-    if appt.appointment_date < today:
+    # 🚫 BLOCK only if past AND not missed/requested
+    if appt.appointment_date < today and appt.status not in ["requested", "missed"]:
         messages.error(request, "Past appointments cannot be rescheduled.")
         return redirect("appointments:doctor_list")
 
