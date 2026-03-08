@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Delete Confirmation | MediTracker</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+
+<body class="bg-[#F7FAFC] font-sans">
+<div class="flex min-h-screen">
+
+  {% include "patients/sidebar.html" %}
+
+  <main class="flex-1 p-10">
+    <div class="max-w-2xl mx-auto">
+      <h1 class="text-4xl font-bold text-[#0F172A] mb-2">⚠️ Delete Confirmation</h1>
+      <p class="text-[#6B7280] mb-10">Are you sure you want to delete this?</p>
+
+      <div class="bg-white rounded-[20px] shadow p-8">
+        <div class="bg-red-50 border-2 border-red-200 rounded-lg p-6 mb-6">
+          <p class="text-red-800 text-lg font-semibold mb-2">
+            ⚠️ This action cannot be undone!
+          </p>
+          <p class="text-red-700">
+            You are about to permanently delete this record. Please confirm your action.
+          </p>
+        </div>
+
+        <form method="post">
+          {% csrf_token %}
+          
+          <div class="flex gap-4">
+            <button type="submit"
+                    class="bg-red-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-red-600 transition">
+              🗑️ Yes, Delete
+            </button>
+            <a href="javascript:history.back()"
+               class="bg-gray-200 text-gray-800 px-6 py-3 rounded-lg font-semibold hover:bg-gray-300 transition">
+              ❌ Cancel
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </main>
+</div>
+</body>
+</html>

@@ -10,8 +10,8 @@ urlpatterns = [
     path("dependent-requests/", views.dependent_requests, name="dependent_requests"),
 path(
     "dependent-requests/<int:pk>/<str:action>/",
-    views.respond_dependent_request,
-    name="respond_dependent_request"
+    views.handle_dependent_request,
+    name="handle_dependent_request"
 ),
 path(
     "dependent-requests/",
